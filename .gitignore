@@ -7,4 +7,7 @@ wheels/
 
 .venv
 .env
+
 todo.md
+graph_attempts.py
+analisys.ipynb
