@@ -17,6 +17,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -95,3 +98,30 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'detailed': {
+            'format': '[{asctime}] [{levelname}] [{name}] [{funcName}:{lineno}] - {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'detailed',
+        },
+    },
+    'loggers': {
+        'core.tasks': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+}
