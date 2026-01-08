@@ -38,3 +38,19 @@ def redis_operation(func):
         except Exception as e:
             raise Exception(e)
     return wrapper
+
+
+@redis_operation
+def set_hash(val:str):
+    return redis_client.set(settings.PKP_HASH_KEY, val)
+
+
+@redis_operation
+def get_hash():
+    _hash = redis_client.get(settings.PKP_HASH_KEY) 
+    
+    if _hash:
+        return _hash
+    else:
+        set_hash('init')
+        return get_hash()

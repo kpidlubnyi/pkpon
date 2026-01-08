@@ -71,9 +71,15 @@ MONGO_DB_NAME = getenv('MONGO_DB_NAME')
 REDIS_HOST = getenv('REDIS_HOST')
 REDIS_PORT = getenv('REDIS_PORT')
 REDIS = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+PKP_HASH_KEY =  getenv('PKP_HASH_KEY')
 
 CELERY_BROKER_URL = REDIS
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+TRANSITLAND_URL=getenv('TRANSITLAND_URL')
+TRANSITLAND_API_KEY=getenv('TRANSITLAND_API_KEY')
+PKP_ONESTOP_ID=getenv('PKP_ONESTOP_ID')
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,7 +126,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'core.tasks': {
+        'tasks.tasks': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
