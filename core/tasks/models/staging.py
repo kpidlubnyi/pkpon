@@ -23,8 +23,8 @@ class StopStaging(AbstractStop):
 
 
 class TripStaging(AbstractTrip):
-    route = ForeignKey(Route, on_delete=CASCADE)
-    service = ForeignKey(Calendar, on_delete=CASCADE)
+    route = ForeignKey(RouteStaging, on_delete=CASCADE)
+    service = ForeignKey(CalendarStaging, on_delete=CASCADE)
     
     _base_model = Trip
 
@@ -33,8 +33,8 @@ class TripStaging(AbstractTrip):
 
 
 class StopTimeStaging(AbstractStopTime):
-    stop = ForeignKey(Stop, on_delete=CASCADE)
-    trip = ForeignKey(Trip, on_delete=CASCADE)
+    stop = ForeignKey(StopStaging, on_delete=CASCADE)
+    trip = ForeignKey(TripStaging, on_delete=CASCADE)
 
     _base_model = StopTime
 
@@ -44,10 +44,10 @@ class StopTimeStaging(AbstractStopTime):
 
 
 class TranferStaging(AbstractTransfer):
-    from_stop = ForeignKey(Stop, on_delete=CASCADE, related_name='st_transfers_from')
-    to_stop = ForeignKey(Stop, on_delete=CASCADE, related_name='st_transfers_to')
-    from_trip = ForeignKey(Trip, on_delete=CASCADE, related_name='st_transfers_from')
-    to_trip = ForeignKey(Trip, on_delete=CASCADE, related_name='st_transfers_to')
+    from_stop = ForeignKey(StopStaging, on_delete=CASCADE, related_name='st_transfers_from')
+    to_stop = ForeignKey(StopStaging, on_delete=CASCADE, related_name='st_transfers_to')
+    from_trip = ForeignKey(TripStaging, on_delete=CASCADE, related_name='st_transfers_from')
+    to_trip = ForeignKey(TripStaging, on_delete=CASCADE, related_name='st_transfers_to')
 
     _base_model = Tranfer
 
