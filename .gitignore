@@ -11,3 +11,5 @@ wheels/
 todo.md
 graph_attempts.py
 analisys.ipynb
+
+core/logs/*.log
