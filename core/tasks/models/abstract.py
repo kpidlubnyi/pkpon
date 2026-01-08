@@ -42,8 +42,8 @@ class AbstractStopTime(models.Model):
     stop_sequence = models.IntegerField()
     arrival_time = models.CharField(max_length=8)
     departure_time = models.CharField(max_length=8)
-    platform = models.SmallIntegerField()
-    track = models.CharField(max_length=8)
+    platform = models.CharField(null=True)
+    track = models.CharField(max_length=8, null=True)
     fare_dist_m = models.IntegerField()
     vehicle_kind = models.CharField(max_length=16)
 
