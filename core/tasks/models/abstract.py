@@ -6,7 +6,7 @@ class AbstractCalendar(models.Model):
     service_id = models.CharField(max_length=10, primary_key=True)
     start_date = models.CharField(max_length=8)
     end_date = models.CharField(max_length=8)
-    weekdays_avialability = ArrayField(models.SmallIntegerField(), 7)
+    weekdays_availability = ArrayField(models.SmallIntegerField(), 7)
 
     class Meta:
         abstract = True
