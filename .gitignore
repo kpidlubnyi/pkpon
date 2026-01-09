@@ -7,6 +7,7 @@ wheels/
 
 .venv
 .env
+.env.local
 
 todo.md
 graph_attempts.py

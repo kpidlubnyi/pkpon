@@ -1,0 +1,161 @@
+#TODO: remove ports in the end of dev
+
+services:
+  core:
+    build:
+      context: ./backend
+    container_name: core
+    volumes:
+      - ./backend/core:/back
+      - logs_volume:/back/logs
+    ports:
+      - "8001:8000"
+    networks:
+      - app-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py create_gtfs_task -e 15 -p "minutes" &&
+      exec gunicorn core.wsgi:application -c gunicorn.conf.py
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  postgres-db:
+    image: postgres:16
+    container_name: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h ${DB_HOST} -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-db:
+    image: mongo:8
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    env_file:
+      - .env
+    volumes:
+      - mongo_data:/data/db
+      - ./backend/mongod.conf:/etc/mongod.conf
+    command: ['mongod', '--config', "/etc/mongod.conf"]
+    networks:
+      - app-network
+    ports:
+      - 27018:27017
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    ports:
+      - 6380:6379
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  celery-worker:
+    build:
+      context: ./backend
+    container_name: celery-worker
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./backend/core:/back
+      - logs_volume:/back/logs
+    depends_on:
+      core:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A core inspect ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  celery-beat:
+    build:
+      context: ./backend
+    container_name: celery-beat
+    entrypoint: []
+    command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend/core:/back
+      - logs_volume:/back/logs
+    depends_on:
+      celery-worker:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  mongo_data:
+  redis_data:
+  logs_volume:
+
+networks:
+  app-network:
+    driver: bridge
