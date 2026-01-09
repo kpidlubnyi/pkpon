@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument('--every', '-e', type=int, default=15)
         parser.add_argument('--period', '-p', type=str,
             choices=['seconds', 'minutes', 'hours', 'days', 'weeks'],
-            default='seconds',
+            default='minutes',
         )
 
     def handle(self, *args, **options):
@@ -43,7 +43,7 @@ class Command(BaseCommand):
             )
 
             if created:
-                logger.info(text:=f'Periodic task {task_name} created successfully!')
+                logger.info(text:=f'Periodic task {task_name} created successfully (interval: {schedule.every} {schedule.period})!')
                 self.stdout.write(self.style.SUCCESS(text))
                 return
             

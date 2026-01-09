@@ -14,20 +14,23 @@ class Command(BaseCommand):
 
         try:
             task = PeriodicTask.objects.get(name=task_name)
+            sch = task.interval
 
         except:
             logger.exception(text:=f"Periodic task {task_name} doesn't exists!")
             self.stdout.write(self.style.ERROR(text))
             return
         
-        deleted = task.delete()
 
-        if deleted:
-            logger.info(text:=f'Periodic task {task_name} removed successfully!')
+        try:
+            task.delete()
+            sch.delete()
+            logger.info(text:=f'Periodic task {task_name} with its interval removed successfully!')
+            
             self.stdout.write(self.style.SUCCESS(text))
-            return
-        else:
-            logger.error(text:=f'Failed to delete {task_name} periodic task!')
+        
+        except Exception as e:
+            logger.error(text:=f'Failed to delete {task_name} periodic task: {e}')
             self.stdout.write(self.style.ERROR(text))
             return
     
