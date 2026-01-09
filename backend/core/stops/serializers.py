@@ -13,11 +13,11 @@ class BaseStopSerializer(ModelSerializer):
         )
 
 
-class StopDetailedSerializer(BaseStopSerializer, ModelSerializer):
-    recent_arrivals_departures = SerializerMethodField()
+# class StopDetailedSerializer(BaseStopSerializer, ModelSerializer):
+#     recent_arrivals_departures = SerializerMethodField()
 
-    def get_recent_arrivals_departures(self, obj:Stop):
-        ...
+#     def get_recent_arrivals_departures(self, obj:Stop):
+#         ...
 
-    class Meta(BaseStopSerializer.Meta):
-        fields = BaseStopSerializer.Meta.fields + ()
+#     class Meta(BaseStopSerializer.Meta):
+#         fields = BaseStopSerializer.Meta.fields + ()
