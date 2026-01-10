@@ -3,7 +3,7 @@ from rest_framework import serializers
 from tasks.models import Stop
 
 class BaseStopSerializer(serializers.ModelSerializer):
-    stop_lng = serializers.CharField(source='stop_lon')
+    stop_lng = serializers.FloatField(source='stop_lon')
 
     class Meta:
         model = Stop
