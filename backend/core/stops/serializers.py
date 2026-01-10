@@ -1,15 +1,17 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework import serializers
 
 from tasks.models import Stop
 
-class BaseStopSerializer(ModelSerializer):
+class BaseStopSerializer(serializers.ModelSerializer):
+    stop_lng = serializers.CharField(source='stop_lon')
+
     class Meta:
         model = Stop
         fields = (
             'stop_id',
             'stop_name',
             'stop_lat',
-            'stop_lon',
+            'stop_lng',
         )
 
 
