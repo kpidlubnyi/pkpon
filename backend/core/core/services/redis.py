@@ -1,7 +1,14 @@
 import redis
+import json
+import uuid
+from logging import getLogger
 
 from django.conf import settings
+from django.utils import timezone as tz
 
+
+
+logger = getLogger('core_services')
 
 try:
     redis_pool = redis.ConnectionPool.from_url(
@@ -54,3 +61,44 @@ def get_hash():
     else:
         set_hash('init')
         return get_hash()
+
+
+@redis_operation
+def create_session(user) -> None:
+    session_id = str(uuid.uuid4())
+    session_data = {
+        'user_id': user.Id,
+        'email': user.Email,
+        'created_at': tz.now(),
+    }
+    
+    try:
+        redis_client.setex(
+            f"session:{session_id}", 
+            6*60*60, # 6 hours
+            json.dumps(session_data, ensure_ascii=False)
+        )
+    except Exception as e:
+        logger.error(f"Error while creating an session in redis: {e}")
+        raise        
+
+
+@redis_operation
+def get_session(session_id: str) -> dict | None:
+    if not session_id:
+        return None
+    
+    session_data = redis_client.get(f"session:{session_id}")
+    
+    if session_data:
+        try:
+            return json.loads(session_data)
+        except json.JSONDecodeError as e:
+            raise
+    return None
+
+
+@redis_operation
+def delete_session(session_id: str) -> bool:
+    result = redis_client.delete(session_id)
+    return result
