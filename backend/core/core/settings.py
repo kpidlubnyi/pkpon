@@ -39,12 +39,6 @@ MIDDLEWARE = [
     'users.middlewares.SessionActivityMiddleware',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'users.auth.RedisSessionAuthentication',
-    ]
-}
-
 ROOT_URLCONF = 'core.urls'
 
 

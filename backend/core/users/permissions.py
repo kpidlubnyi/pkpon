@@ -16,5 +16,4 @@ class IsAuthenticatedUser(BasePermission):
         if not session_data:
             return False
 
-        return session_data.get('user_id') == user.Id
-
+        return session_data.get('user_id') == str(user.user_id)

@@ -34,11 +34,8 @@ class RedisSessionAuthentication(BaseAuthentication):
             raise AuthenticationFailed('Sesja nie ważna!')
 
         try:
-            user = User.objects.get(
-                Id=session_data['user_id'],
-                IsActive=1
-            )
+            user = User.objects.get(user_id=session_data['user_id'])
         except User.DoesNotExist:
-            raise AuthenticationFailed('Uzytkownik nie istnieje lub nie jest aktywny!')
+            raise AuthenticationFailed('Uzytkownik nie istnieje!')
 
         return (user, session_id)

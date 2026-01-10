@@ -64,12 +64,12 @@ def get_hash():
 
 
 @redis_operation
-def create_session(user) -> None:
+def create_session(user) -> str | None:
     session_id = str(uuid.uuid4())
     session_data = {
-        'user_id': user.Id,
-        'email': user.Email,
-        'created_at': tz.now(),
+        'user_id': str(user.user_id),
+        'email': user.email,
+        'created_at': tz.now().isoformat(),
     }
     
     try:
@@ -78,6 +78,8 @@ def create_session(user) -> None:
             6*60*60, # 6 hours
             json.dumps(session_data, ensure_ascii=False)
         )
+        return session_id
+    
     except Exception as e:
         logger.error(f"Error while creating an session in redis: {e}")
         raise        
@@ -100,5 +102,5 @@ def get_session(session_id: str) -> dict | None:
 
 @redis_operation
 def delete_session(session_id: str) -> bool:
-    result = redis_client.delete(session_id)
+    result = redis_client.delete(f"session:{session_id}")
     return result
