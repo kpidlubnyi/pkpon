@@ -4,8 +4,8 @@ import logging
 from core.services.redis import set_hash
 from tasks.services.gtfs.download import FeedGTFS
 from tasks.services.gtfs.db import (
-    import_gtfs_to_staging, swap_tables, 
-    backup_from_common_tables
+    backup_from_common_tables, recreate_data_in_final_trips,
+    import_gtfs_to_staging, swap_tables
 )
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,9 @@ def check_gtfs_update():
         else:
             logger.info("Swapping staging and production tables...")
             swap_tables()
+
+            logger.info("Recreating data in the FinalTrips unlogged table...")
+            recreate_data_in_final_trips()
 
             logger.info("Updating the hash...")
             set_hash(feed.sha)
