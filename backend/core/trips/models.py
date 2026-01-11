@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 
-class FinalTrip(models.Model):
+class CompleteTrip(models.Model):
     trip_ids = ArrayField(models.CharField(max_length=32))
 
     class Meta:

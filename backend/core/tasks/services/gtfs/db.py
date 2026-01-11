@@ -1,6 +1,6 @@
 from django.db import transaction, connection
 
-from trips.models import FinalTrip
+from trips.models import CompleteTrip
 from .process import *
 
 
@@ -77,7 +77,7 @@ def backup_from_common_tables():
 
 
 def recreate_data_in_final_trips():
-    FinalTrip.objects.all().delete()
+    CompleteTrip.objects.all().delete()
 
     processed_trip_ids = set()
     final_trips = []
@@ -109,7 +109,7 @@ def recreate_data_in_final_trips():
             current_trip = transfer.to_trip
 
         final_trips.append(
-            FinalTrip(trip_ids=envolved_trip_ids)
+            CompleteTrip(trip_ids=envolved_trip_ids)
         )
 
-    FinalTrip.objects.bulk_create(final_trips)
+    CompleteTrip.objects.bulk_create(final_trips)
