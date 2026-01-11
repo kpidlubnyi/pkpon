@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'stops',
     'tasks',
     'users',
+    'trips',
 ]
 
 MIDDLEWARE = [

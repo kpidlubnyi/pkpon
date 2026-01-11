@@ -10,5 +10,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('stops/', include('stops.urls')),
     path('users/', include('users.urls')),
+    path('trips/', include('trips.urls')),
     path('health/', health_check), 
 ]
