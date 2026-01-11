@@ -37,7 +37,7 @@ class StopTime(AbstractStopTime):
         unique_together = [['trip', 'stop_sequence']]
 
 
-class Tranfer(AbstractTransfer):
+class Transfer(AbstractTransfer):
     from_stop = ForeignKey(Stop, on_delete=CASCADE, related_name='transfers_from')
     to_stop = ForeignKey(Stop, on_delete=CASCADE, related_name='transfers_to')
     from_trip = ForeignKey(Trip, on_delete=CASCADE, related_name='transfers_from')

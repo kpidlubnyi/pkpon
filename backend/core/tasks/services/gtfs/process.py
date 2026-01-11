@@ -16,7 +16,7 @@ GTFS_MODELS_ST = {
     'stops': StopStaging,
     'trips': TripStaging,
     'stop_times': StopTimeStaging,
-    'transfers': TranferStaging, 
+    'transfers': TransferStaging, 
 }
 
 

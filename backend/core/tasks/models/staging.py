@@ -43,13 +43,13 @@ class StopTimeStaging(AbstractStopTime):
         unique_together = [['trip', 'stop_sequence']]
 
 
-class TranferStaging(AbstractTransfer):
+class TransferStaging(AbstractTransfer):
     from_stop = ForeignKey(StopStaging, on_delete=CASCADE, related_name='st_transfers_from')
     to_stop = ForeignKey(StopStaging, on_delete=CASCADE, related_name='st_transfers_to')
     from_trip = ForeignKey(TripStaging, on_delete=CASCADE, related_name='st_transfers_from')
     to_trip = ForeignKey(TripStaging, on_delete=CASCADE, related_name='st_transfers_to')
 
-    _base_model = Tranfer
+    _base_model = Transfer
 
     class Meta:
         db_table = 'staging_Transfers'
