@@ -8,7 +8,7 @@ from trips.models import CompleteTrip
 class BaseTripSerializer(ModelSerializer):
     class Meta:
         model = Trip
-        exclude = ('block_id', 'service_id')
+        exclude = ('block_id', 'service')
 
 
 class BaseCompleteTripSerializer(ModelSerializer):
