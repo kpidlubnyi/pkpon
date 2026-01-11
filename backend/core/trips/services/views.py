@@ -1,3 +1,5 @@
+import json
+
 from trips.serializers import BaseCompleteTripSerializer, BaseTripSerializer
 from trips.models import CompleteTrip
 from tasks.models import Trip
@@ -6,7 +8,7 @@ from core.services.redis import get_cached_trip, set_cached_trip
 
 def get_trip(trip_id) -> dict:
     if (cached_trip:=get_cached_trip(trip_id)):
-        return cached_trip
+        return json.loads(cached_trip)
     
     completed_trip = CompleteTrip.objects.get(trip_ids__contains=[trip_id])
     

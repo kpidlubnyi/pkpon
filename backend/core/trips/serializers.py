@@ -1,14 +1,42 @@
 from collections import Counter
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from tasks.models import Trip
+from stops.serializers import BaseStopTimeSerializer
+from tasks.models import Route, Trip, StopTime
 from trips.models import CompleteTrip
 
 
+class BaseRouteSerializers(ModelSerializer):
+    class Meta:
+        model = Route
+        fields = (
+            'route_id',
+            'route_short_name',
+            'route_long_name',
+            'route_type',
+        )
+
+
 class BaseTripSerializer(ModelSerializer):
+    trip_stops = SerializerMethodField()
+    route = BaseRouteSerializers()
+
+    def get_trip_stops(self, obj:Trip):
+        stop_times = StopTime.objects.filter(trip_id=obj.trip_id)
+        serialized = BaseStopTimeSerializer(stop_times, many=True).data
+        return serialized 
+
     class Meta:
         model = Trip
-        exclude = ('block_id', 'service')
+        fields = (
+            'route',
+            'trip_id',
+            'trip_headsign',
+            'trip_short_name',
+            'plk_train_number',
+            'carriages',
+            'trip_stops',
+        )
 
 
 class BaseCompleteTripSerializer(ModelSerializer):
