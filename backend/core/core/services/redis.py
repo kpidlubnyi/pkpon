@@ -104,3 +104,36 @@ def get_session(session_id: str) -> dict | None:
 def delete_session(session_id: str) -> bool:
     result = redis_client.delete(f"session:{session_id}")
     return result
+
+
+@redis_operation
+def set_cached_trip(trip_id, trip_data):
+    return redis_client.set(
+        f"trip:{trip_id}", 
+        json.dumps(
+            trip_data, ensure_ascii=False)
+        )
+
+
+@redis_operation
+def get_cached_trip(trip_id: str) -> dict | None:
+    trip_data = redis_client.get(f"trip:{trip_id}")
+    return trip_data
+
+
+@redis_operation
+def truncate_cached_trips() -> int:
+    deleted_count = 0
+    cursor = 0
+
+    while True:
+        cursor, keys = redis_client.scan(cursor=cursor, match='trip:*', count=1000)
+
+        if keys:
+            redis_client.delete(*keys)
+            deleted_count += len(keys)
+
+        if cursor == 0:
+            break
+
+    return deleted_count

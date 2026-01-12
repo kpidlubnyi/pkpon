@@ -3,4 +3,6 @@ from django.urls import path
 from .views import *
 
 
-urlpatterns = []
+urlpatterns = [
+    path('<str:trip_id>/', TripView.as_view()),
+]

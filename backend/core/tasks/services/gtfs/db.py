@@ -1,5 +1,6 @@
 from django.db import transaction, connection
 
+from trips.models import CompleteTrip
 from .process import *
 
 
@@ -73,3 +74,42 @@ def backup_from_common_tables():
                             
                             cursor.execute(f"SELECT setval('{sequence_name}', {max_id+1});")
                             cursor.execute(f"SELECT setval('{sequence_name_staging}', {max_id+1});")
+
+
+def recreate_data_in_final_trips():
+    CompleteTrip.objects.all().delete()
+
+    processed_trip_ids = set()
+    final_trips = []
+
+    for start_trip in Trip.objects.all().order_by("trip_id"):
+        if start_trip.trip_id in processed_trip_ids:
+            continue
+
+        envolved_trip_ids = []
+        current_trip = start_trip
+
+        while True:
+            if current_trip.trip_id in processed_trip_ids:
+                break
+
+            processed_trip_ids.add(current_trip.trip_id)
+            envolved_trip_ids.append(current_trip.trip_id)
+
+            transfer = (
+                Transfer.objects
+                .filter(from_trip=current_trip)
+                .select_related("to_trip")
+                .first()
+            )
+
+            if not transfer:
+                break
+
+            current_trip = transfer.to_trip
+
+        final_trips.append(
+            CompleteTrip(trip_ids=envolved_trip_ids)
+        )
+
+    CompleteTrip.objects.bulk_create(final_trips)

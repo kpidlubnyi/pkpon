@@ -14,6 +14,7 @@ class SessionActivityMiddleware:
             re.compile(r'^/stops/'),
             re.compile(r'^/users/(signup|login|logout)/'),
             re.compile(r'^/health/'),
+            re.compile(r'^/trips/'),
         ]
 
     def __call__(self, request):
