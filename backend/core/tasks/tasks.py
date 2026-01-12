@@ -1,7 +1,7 @@
 from celery import shared_task
 import logging
 
-from core.services.redis import set_hash
+from core.services.redis import set_hash, truncate_cached_trips
 from tasks.services.gtfs.download import FeedGTFS
 from tasks.services.gtfs.db import (
     backup_from_common_tables, recreate_data_in_final_trips,
@@ -40,7 +40,10 @@ def check_gtfs_update():
             logger.info("Recreating data in the FinalTrips unlogged table...")
             recreate_data_in_final_trips()
 
-            logger.info("Updating the hash...")
+            logger.info("Truncating cached trips...")
+            deleted = truncate_cached_trips()
+
+            logger.info(f"Deleted {deleted} cached trips. Updating the hash...")
             set_hash(feed.sha)
 
         logger.info("Backing up production tables to staging...")

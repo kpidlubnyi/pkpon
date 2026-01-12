@@ -119,3 +119,21 @@ def set_cached_trip(trip_id, trip_data):
 def get_cached_trip(trip_id: str) -> dict | None:
     trip_data = redis_client.get(f"trip:{trip_id}")
     return trip_data
+
+
+@redis_operation
+def truncate_cached_trips() -> int:
+    deleted_count = 0
+    cursor = 0
+
+    while True:
+        cursor, keys = redis_client.scan(cursor=cursor, match='trip:*', count=1000)
+
+        if keys:
+            redis_client.delete(*keys)
+            deleted_count += len(keys)
+
+        if cursor == 0:
+            break
+
+    return deleted_count
