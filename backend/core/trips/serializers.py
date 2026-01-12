@@ -18,10 +18,10 @@ class BaseRouteSerializers(ModelSerializer):
 
 
 class BaseTripSerializer(ModelSerializer):
-    trip_stops = SerializerMethodField()
+    trip_stop_times = SerializerMethodField()
     route = BaseRouteSerializers()
 
-    def get_trip_stops(self, obj:Trip):
+    def get_trip_stop_times(self, obj:Trip):
         stop_times = StopTime.objects.filter(trip_id=obj.trip_id)
         serialized = BaseStopTimeSerializer(stop_times, many=True).data
         return serialized 
@@ -35,11 +35,12 @@ class BaseTripSerializer(ModelSerializer):
             'trip_short_name',
             'plk_train_number',
             'carriages',
-            'trip_stops',
+            'trip_stop_times',
         )
 
 
 class BaseCompleteTripSerializer(ModelSerializer):
+    trip_stop_times = SerializerMethodField()
     trip_short_name = SerializerMethodField()
     trip_headsign = SerializerMethodField()
     routes = SerializerMethodField()
@@ -53,6 +54,7 @@ class BaseCompleteTripSerializer(ModelSerializer):
                 Trip.objects
                 .filter(trip_id__in=obj.trip_ids)
                 .values(
+                    'trip_id',
                     'trip_short_name',
                     'trip_headsign',
                     'route_id',
@@ -88,6 +90,27 @@ class BaseCompleteTripSerializer(ModelSerializer):
 
     def get_routes(self, obj) -> list:
         return list(set(self._values(obj, 'route_id')))
+    
+    def get_trip_stop_times(self, obj:CompleteTrip):
+        trip_ids = obj.trip_ids
+        l = len(trip_ids)
+        stop_times = []
+
+        for i, trip_id in enumerate(trip_ids, 1):
+            trip_stop_times = StopTime.objects \
+                .filter(trip_id=trip_id) \
+                .order_by('stop_sequence')
+
+            trip_ls_count = trip_stop_times.count() 
+            lim = trip_ls_count - 1 if i != l else trip_ls_count
+
+            serialized = BaseStopTimeSerializer(trip_stop_times[:lim],many=True).data
+            stop_times.extend(serialized) 
+
+        for i, stop_time in enumerate(stop_times):
+            stop_time['stop_sequence'] = i
+
+        return stop_times
 
     class Meta:
         model = CompleteTrip
@@ -98,4 +121,5 @@ class BaseCompleteTripSerializer(ModelSerializer):
             'legs',
             'plk_train_number',
             'carriages',
+            'trip_stop_times',
         )
