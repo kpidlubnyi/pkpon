@@ -32,19 +32,19 @@ api.interceptors.response.use((response) => response,
 
 export const authAPI = {
     register: async (userData: RegisterData): Promise<AuthResponse> => {
-        const res = await api.post<AuthResponse>('users/signup', userData)
+        const res = await api.post<AuthResponse>('users/signup/', userData)
         return res.data;
     },
 
     login: async (credentials: LoginData): Promise<AuthResponse> => {
-        const res = await api.post<AuthResponse>('users/login', credentials);
+        const res = await api.post<AuthResponse>('users/login/', credentials);
         return res.data;
     },
 
     logout: async (): Promise<LogoutResponse> => {
-        const res = await api.post<LogoutResponse>('users/logout');
+        const res = await api.post<LogoutResponse>('users/logout/');
             return res.data;
     },
 
-    getProfile: () => api.get<UserProfileResponse>('users/profile'),
+    getProfile: () => api.get<UserProfileResponse>('users/profile/'),
 }

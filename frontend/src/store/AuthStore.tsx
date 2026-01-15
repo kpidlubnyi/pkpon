@@ -12,6 +12,13 @@ interface AuthResult {
   error?: string;
 }
 
+interface DRFValidationError {
+  [key: string]: string[] | string | undefined; // тепер error:string теж підходить
+  non_field_errors?: string[];
+}
+
+
+
 interface AuthState {
   user: User | null;
   loading: boolean;
@@ -63,45 +70,63 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return { success: true };
     } catch (error: unknown) {
-  if (axios.isAxiosError<{ error: string }>(error)) {
-    return {
-      success: false,
-      error: error.response?.data?.error || 'Błąd logowania',
-    };
+  if (axios.isAxiosError(error) && error.response?.data) {
+    const data = error.response.data as DRFValidationError;
+
+    const fieldErrors = Object.entries(data)
+      .filter(([, value]) => Array.isArray(value))
+      .map(([key, value]) => `${key}: ${(value as string[]).join(', ')}`);
+
+    const generalError = typeof data.error === 'string' ? data.error : 
+                           Array.isArray(data.error) ? data.error.join(', ') : 
+                           Array.isArray(data.non_field_errors) ? data.non_field_errors.join(', ') : '';
+
+    const message = fieldErrors.length > 0
+      ? fieldErrors.join(' | ')
+      : generalError || 'Błąd rejestracji';
+
+    return { success: false, error: message };
   }
 
-  return {
-    success: false,
-    error: 'Błąd logowania',
+  return { success: false, error: 'Błąd rejestracji' };
   };
-}
   },
 
-  register: async (data) => {
-    try {
-      const res = await authAPI.register(data);
-      localStorage.setItem('session_id', res.session_id);
+register: async (data) => {
+  try {
+    const res = await authAPI.register(data);
+    localStorage.setItem('session_id', res.session_id);
 
-      const profile = await authAPI.getProfile();
-      set({
-        user: profile.data.user,
-        showAuthModal: false,
-      });
+    const profile = await authAPI.getProfile();
+    set({
+      user: profile.data.user,
+      showAuthModal: false,
+    });
 
-      return { success: true };
-    } catch (error) {
-      if (axios.isAxiosError<{ error: string }>(error)) {
-        return {
-          success: false,
-          error: error.response?.data?.error || 'Błąd rejestracji',
-        };
-      }
-      return {
-        success: false,
-        error: 'Błąd rejestracji',
-      };
-    }
-  },
+    return { success: true };
+  } catch (error: unknown) {
+  if (axios.isAxiosError(error) && error.response?.data) {
+    const data = error.response.data as DRFValidationError;
+
+    const fieldErrors = Object.entries(data)
+      .filter(([, value]) => Array.isArray(value))
+      .map(([key, value]) => `${key}: ${(value as string[]).join(', ')}`);
+
+    const generalError = typeof data.error === 'string' ? data.error : 
+                           Array.isArray(data.error) ? data.error.join(', ') : 
+                           Array.isArray(data.non_field_errors) ? data.non_field_errors.join(', ') : '';
+
+    const message = fieldErrors.length > 0
+      ? fieldErrors.join(' | ')
+      : generalError || 'Błąd rejestracji';
+
+    return { success: false, error: message };
+  }
+
+  return { success: false, error: 'Błąd rejestracji' };
+  };
+},
+
 
   logout: async () => {
     try {
