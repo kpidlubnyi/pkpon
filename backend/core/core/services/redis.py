@@ -2,6 +2,7 @@ import redis
 import json
 import uuid
 from logging import getLogger
+from typing import Any
 
 from django.conf import settings
 from django.utils import timezone as tz
@@ -107,27 +108,50 @@ def delete_session(session_id: str) -> bool:
 
 
 @redis_operation
-def set_cached_trip(trip_id, trip_data):
-    return redis_client.set(
-        f"trip:{trip_id}", 
-        json.dumps(
-            trip_data, ensure_ascii=False)
-        )
+def set_cached(prefix: str, key: str, value: dict | str, *, is_json: bool = False) -> int:
+    key = f'{prefix}:{key}'
+    value = json.dumps(value) if is_json else value
+    return redis_client.set(key, value)
+
+
+def set_cached_trip(trip_id:str, trip_data:dict[str, Any]):
+    return set_cached('trip', trip_id, trip_data, is_json=True)
+
+def set_cached_subroute(start_id:str, end_id:str, value:str) -> int:
+    key = f'{start_id}-{end_id}'
+    return set_cached('subroute', key, value)
+
+def set_cached_route(trip_id:str, value:str) -> int:
+    return set_cached('route', trip_id, value)
 
 
 @redis_operation
+def get_cached(prefix: str, key: str, *, is_json: bool = False) -> dict | str | None:
+    key = f'{prefix}:{key}'
+    value = redis_client.get(key)
+    if not value:
+        return None
+    return json.loads(value) if is_json else value
+
+
 def get_cached_trip(trip_id: str) -> dict | None:
-    trip_data = redis_client.get(f"trip:{trip_id}")
-    return trip_data
+    return get_cached('trip', trip_id, is_json=True)
+
+def get_cached_subroute(start_id:str, end_id:str) -> str | None:
+    key = f'{start_id}-{end_id}'
+    return get_cached('subroute', key)
+
+def get_cached_route(trip_id:str) -> str | None:
+    return get_cached('route', trip_id)
 
 
 @redis_operation
-def truncate_cached_trips() -> int:
+def truncate_cached(pattern:str) -> int:
     deleted_count = 0
     cursor = 0
 
     while True:
-        cursor, keys = redis_client.scan(cursor=cursor, match='trip:*', count=1000)
+        cursor, keys = redis_client.scan(cursor=cursor, match=pattern, count=1000)
 
         if keys:
             redis_client.delete(*keys)
@@ -137,3 +161,19 @@ def truncate_cached_trips() -> int:
             break
 
     return deleted_count
+
+
+def truncate_cached_trips() -> int:
+    return truncate_cached('trip:*')
+    
+def truncate_cached_subroutes() -> int:
+    return truncate_cached('subroute:*')
+
+def truncate_cached_routes() -> int:
+    return truncate_cached('route:*')
+
+def truncate_gtfs_related_cached_data() -> int:
+    return truncate_cached_trips() + truncate_cached_routes()
+
+def truncate_map_related_cached_data() -> int:
+    return truncate_cached_routes()

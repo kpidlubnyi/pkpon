@@ -8,7 +8,7 @@ from core.services.redis import get_cached_trip, set_cached_trip
 
 def get_trip(trip_id) -> dict:
     if (cached_trip:=get_cached_trip(trip_id)):
-        return json.loads(cached_trip)
+        return cached_trip
     
     completed_trip = CompleteTrip.objects.get(trip_ids__contains=[trip_id])
     
