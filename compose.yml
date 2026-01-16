@@ -22,13 +22,7 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    command: >
-      sh -c "
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py create_gtfs_task -e 15 -p "minutes" &&
-      exec gunicorn core.wsgi:application -c gunicorn.conf.py
-      "
+    entrypoint: /back/entrypoint_core.sh
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health/ || exit 1"]
       interval: 30s
@@ -104,7 +98,7 @@ services:
     build:
       context: ./backend
     container_name: celery-worker
-    command: celery -A core worker --loglevel=info
+    entrypoint: /back/entrypoint_cw.sh
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
@@ -133,8 +127,7 @@ services:
     build:
       context: ./backend
     container_name: celery-beat
-    entrypoint: []
-    command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    entrypoint: /back/entrypoint_cb.sh
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
