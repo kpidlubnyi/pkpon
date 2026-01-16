@@ -2,32 +2,18 @@ import json
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-from django_celery_beat.schedulers import PeriodicTask, IntervalSchedule
+from django_celery_beat.schedulers import PeriodicTask
 
+from tasks.services.commands import validate_interval, add_interval_arguments
 
 
 logger = getLogger('tasks_commands')
 
 
-def validate_interval(options) -> IntervalSchedule | None:
-    try:
-        interval_names = ['every', 'period']
-        interval_args = {name: options[name] for name in interval_names}
-        interval, _ = IntervalSchedule.objects.get_or_create(**interval_args)
-        return interval
-    
-    except Exception as e:
-        logger.error(f"Error creating IntervalSchedule with args: {interval_args}")
-        raise
-
-
 class Command(BaseCommand):
+    @add_interval_arguments
     def add_arguments(self, parser):
-        parser.add_argument('--every', '-e', type=int, default=15)
-        parser.add_argument('--period', '-p', type=str,
-            choices=['seconds', 'minutes', 'hours', 'days', 'weeks'],
-            default='minutes',
-        )
+        pass
 
     def handle(self, *args, **options):
         schedule = validate_interval(options)
