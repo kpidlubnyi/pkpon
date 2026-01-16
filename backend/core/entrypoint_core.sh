@@ -5,5 +5,6 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py create_gtfs_task -e 15 -p minutes
 python manage.py create_map_task -e 3 -p days
+python manage.py tasks_initial_run 
 
 exec gunicorn core.wsgi:application -c gunicorn.conf.py

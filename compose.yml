@@ -102,6 +102,7 @@ services:
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
+      - flags_volume:/back/flags
     depends_on:
       core:
         condition: service_healthy

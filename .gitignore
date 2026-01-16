@@ -15,5 +15,5 @@ analisys.ipynb
 
 backend/core/logs/*.log
 
-backend/flags/*
-!backend/flags/.gitkeep
+backend/core/flags/*
+!backend/core/flags/.gitkeep
