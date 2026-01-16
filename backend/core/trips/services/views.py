@@ -1,5 +1,3 @@
-import json
-
 from trips.serializers import BaseCompleteTripSerializer, BaseTripSerializer
 from trips.models import CompleteTrip
 from tasks.models import Trip

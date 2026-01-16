@@ -1,7 +1,10 @@
 from celery import shared_task
 import logging
+import os
 
-from core.services.redis import set_hash, truncate_gtfs_related_cached_data
+from django.conf import settings
+
+from core.services.redis import set_hash, truncate_gtfs_related_cached_data, get_hash
 from tasks.services.gtfs.download import FeedGTFS
 from tasks.services.gtfs.db import (
     backup_from_common_tables, recreate_data_in_final_trips,
@@ -54,3 +57,20 @@ def check_gtfs_update():
 
     except Exception as e:
         logger.exception("Error in GTFS import task: %s", e)
+
+
+@shared_task
+def update_orr_map():
+    try:
+        path = settings.BASE_DIR / 'flags'
+        os.makedirs(path, exist_ok=True)
+        
+        NEW_MAP_FLAG_FILE = settings.ORR_NEW_MAP_FLAG_FILE
+        flag_path = path / NEW_MAP_FLAG_FILE
+        
+        with open(flag_path, 'w'):
+            pass
+        
+        return {'created': True, 'path':flag_path}
+    except Exception as e:
+        return {'created': False, 'error': e}
