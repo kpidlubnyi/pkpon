@@ -17,8 +17,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         schedule = validate_interval(options)
-        task_name = "GTFS_UPDATING_TASK"
-        task_path = 'tasks.tasks.check_gtfs_update'
+        task_name = "ORR_MAP_UPDATING_TASK"
+        task_path = 'tasks.tasks.update_orr_map'
 
         try:
             _, created = PeriodicTask.objects.get_or_create(

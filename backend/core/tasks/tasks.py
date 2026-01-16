@@ -1,7 +1,10 @@
 from celery import shared_task
 import logging
+import os
 
-from core.services.redis import set_hash, truncate_cached_trips
+from django.conf import settings
+
+from core.services.redis import set_hash, truncate_gtfs_related_cached_data, get_hash
 from tasks.services.gtfs.download import FeedGTFS
 from tasks.services.gtfs.db import (
     backup_from_common_tables, recreate_data_in_final_trips,
@@ -40,10 +43,10 @@ def check_gtfs_update():
             logger.info("Recreating data in the FinalTrips unlogged table...")
             recreate_data_in_final_trips()
 
-            logger.info("Truncating cached trips...")
-            deleted = truncate_cached_trips()
+            logger.info("Deleting GTFS related cached data...")
+            deleted = truncate_gtfs_related_cached_data()
 
-            logger.info(f"Deleted {deleted} cached trips. Updating the hash...")
+            logger.info(f"Deleted {deleted} cached records. Updating the hash...")
             set_hash(feed.sha)
 
         logger.info("Backing up production tables to staging...")
@@ -54,3 +57,20 @@ def check_gtfs_update():
 
     except Exception as e:
         logger.exception("Error in GTFS import task: %s", e)
+
+
+@shared_task
+def update_orr_map():
+    try:
+        path = settings.BASE_DIR / 'flags'
+        os.makedirs(path, exist_ok=True)
+        
+        NEW_MAP_FLAG_FILE = settings.ORR_NEW_MAP_FLAG_FILE
+        flag_path = path / NEW_MAP_FLAG_FILE
+        
+        with open(flag_path, 'w'):
+            pass
+        
+        return {'created': True, 'path':flag_path}
+    except Exception as e:
+        return {'created': False, 'error': e}

@@ -8,6 +8,7 @@ services:
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
+      - flags_volume:/back/flags
     ports:
       - "8001:8000"
     networks:
@@ -21,13 +22,7 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    command: >
-      sh -c "
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py create_gtfs_task -e 15 -p "minutes" &&
-      exec gunicorn core.wsgi:application -c gunicorn.conf.py
-      "
+    entrypoint: /back/entrypoint_core.sh
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health/ || exit 1"]
       interval: 30s
@@ -103,10 +98,11 @@ services:
     build:
       context: ./backend
     container_name: celery-worker
-    command: celery -A core worker --loglevel=info
+    entrypoint: /back/entrypoint_cw.sh
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
+      - flags_volume:/back/flags
     depends_on:
       core:
         condition: service_healthy
@@ -132,8 +128,7 @@ services:
     build:
       context: ./backend
     container_name: celery-beat
-    entrypoint: []
-    command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    entrypoint: /back/entrypoint_cb.sh
     volumes:
       - ./backend/core:/back
       - logs_volume:/back/logs
@@ -150,11 +145,36 @@ services:
       - app-network
     restart: unless-stopped
 
+  orr:
+    build: 
+      context: ./OpenRailRouting
+    container_name: orr
+    volumes:
+      - flags_volume:/opt/orr/flags
+    environment:
+      - JAVA_OPTS=-Xms1000m -Xmx2500m
+      - ORR_NEW_MAP_FLAG_FILE
+      - ORR_GRAPH_READY_FLAG_FILE
+      - OSM_POLAND_URL
+    networks:
+      - app-network
+    ports:
+      - "9002:9000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/health || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 3m
+
+
 volumes:
   pg_data:
   mongo_data:
   redis_data:
   logs_volume:
+  flags_volume:
 
 networks:
   app-network:

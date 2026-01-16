@@ -1,0 +1,3 @@
+[submodule "OpenRailRouting"]
+	path = OpenRailRouting
+	url = https://github.com/geofabrik/OpenRailRouting
