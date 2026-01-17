@@ -18,8 +18,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      mongo-db:
-        condition: service_healthy
     env_file:
       - .env
     command: >
@@ -61,30 +59,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mongo-db:
-    image: mongo:8
-    container_name: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
-    env_file:
-      - .env
-    volumes:
-      - mongo_data:/data/db
-      - ./backend/mongod.conf:/etc/mongod.conf
-    command: ['mongod', '--config', "/etc/mongod.conf"]
-    networks:
-      - app-network
-    ports:
-      - 27018:27017
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:7.2-alpine
     container_name: redis
@@ -114,8 +88,6 @@ services:
       core:
         condition: service_healthy
       postgres-db:
-        condition: service_healthy
-      mongo-db:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -180,7 +152,6 @@ services:
 
 volumes:
   pg_data:
-  mongo_data:
   redis_data:
   logs_volume:
   flags_volume:

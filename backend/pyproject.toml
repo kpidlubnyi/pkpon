@@ -15,7 +15,6 @@ dependencies = [
     "pandas>=2.3.3",
     "polyline>=2.0.4",
     "psycopg2-binary>=2.9.10",
-    "pymongo>=4.15.1",
     "redis>=6.4.0",
     "requests>=2.32.5",
 ]

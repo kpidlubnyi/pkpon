@@ -10,7 +10,6 @@ wheels/
 .env.local
 
 todo.md
-graph_attempts.py
 analisys.ipynb
 
 backend/core/logs/*.log

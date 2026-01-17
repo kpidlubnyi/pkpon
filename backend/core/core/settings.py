@@ -98,9 +98,6 @@ DATABASES = {
     }
 }
 
-MONGO_URI = getenv('MONGO_URI')
-MONGO_DB_NAME = getenv('MONGO_DB_NAME')
-
 REDIS_HOST = getenv('REDIS_HOST')
 REDIS_PORT = getenv('REDIS_PORT')
 REDIS = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
