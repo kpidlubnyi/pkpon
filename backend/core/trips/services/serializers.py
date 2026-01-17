@@ -1,10 +1,47 @@
 import polyline
+from collections import defaultdict
+from functools import lru_cache
 
 from django.db.models import QuerySet
 
 from tasks.models import StopTime
+from trips.models import CompleteTrip
 from core.services.orr import get_polyline_between_stops
 from core.services.redis import *
+
+
+@lru_cache(16)
+def get_stop_times_by_trip(ct:CompleteTrip) -> dict[str, list[StopTime]]:
+    stop_times = (
+        StopTime.objects
+        .filter(trip_id__in=ct.trip_ids)
+        .select_related()
+        .order_by('trip_id', 'stop_sequence')
+    )
+
+    d = defaultdict(list)
+    for st in stop_times:
+        d[st.trip_id].append(st)
+
+    return d
+
+
+def build_trip_stop_times(ct: CompleteTrip):
+    l = len(ct.trip_ids)
+    stop_times_by_trip = get_stop_times_by_trip(ct)
+
+    stop_times = []
+    for i, trip_id in enumerate(ct.trip_ids):
+        trip_stop_times = stop_times_by_trip[trip_id]
+        st_l = len(trip_stop_times)
+
+        lim = st_l - 1 if i != l - 1 else st_l
+        stop_times.extend(trip_stop_times[:lim])
+
+    for i, stop_time in enumerate(stop_times):
+        stop_time.stop_sequence = i
+
+    return stop_times
 
 
 def get_trip_polyline(stop_times: QuerySet[StopTime]) -> str:
