@@ -1,4 +1,4 @@
-from django.db.models import CASCADE, ForeignKey
+from django.db.models import CASCADE, ForeignKey, QuerySet
 
 from .abstract import (
     AbstractCalendar, AbstractRoute, AbstractStop,

@@ -70,7 +70,7 @@ def create_session(user) -> str | None:
     session_data = {
         'user_id': str(user.user_id),
         'email': user.email,
-        'created_at': tz.now().isoformat(),
+        'created_at': tz.localtime().isoformat(),
     }
     
     try:

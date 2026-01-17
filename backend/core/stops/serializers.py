@@ -1,6 +1,29 @@
+from django.utils import timezone as tz
 from rest_framework import serializers
 
 from tasks.models import Stop, StopTime
+from stops.services.views import *
+
+
+class StopScheduleSerializer(serializers.Serializer):
+    date = serializers.DateField(required=False, allow_null=True)
+    time = serializers.TimeField(required=False, allow_null=True)
+    direction = serializers.ChoiceField(
+        choices=('departures', 'arrivals'),
+        default='departures'
+    )
+
+    def validate(self, attrs):
+        now = tz.localtime()
+
+        if not attrs.get('date'):
+            attrs['date'] = now.date()
+
+        if not attrs.get('time'):
+            attrs['time'] = now.time()
+
+        return attrs
+
 
 class BaseStopSerializer(serializers.ModelSerializer):
     stop_lng = serializers.FloatField(source='stop_lon')
@@ -15,14 +38,18 @@ class BaseStopSerializer(serializers.ModelSerializer):
         )
 
 
-# class StopDetailedSerializer(BaseStopSerializer, ModelSerializer):
-#     recent_arrivals_departures = SerializerMethodField()
+class StopDetailedSerializer(BaseStopSerializer, serializers.ModelSerializer):
+    schedule = serializers.SerializerMethodField()
 
-#     def get_recent_arrivals_departures(self, obj:Stop):
-#         ...
+    def get_schedule(self, obj:Stop):
+        now = tz.localtime()
+        stop_schedule = get_stop_schedule(obj.stop_id, 'departures', now.date(), now.time())  
+        return BaseStopTimeSerializer(stop_schedule, many=True).data
 
-#     class Meta(BaseStopSerializer.Meta):
-#         fields = BaseStopSerializer.Meta.fields + ()
+    class Meta(BaseStopSerializer.Meta):
+        fields = BaseStopSerializer.Meta.fields + (
+            'schedule',
+        )
 
 
 class BaseStopTimeSerializer(serializers.ModelSerializer):

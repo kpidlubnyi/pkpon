@@ -26,7 +26,7 @@ def get_stop_times_by_trip(ct:CompleteTrip) -> dict[str, list[StopTime]]:
     return d
 
 
-def build_trip_stop_times(ct: CompleteTrip):
+def build_trip_stop_times(ct: CompleteTrip) -> list[StopTime]:
     l = len(ct.trip_ids)
     stop_times_by_trip = get_stop_times_by_trip(ct)
 
