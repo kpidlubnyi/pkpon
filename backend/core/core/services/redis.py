@@ -7,6 +7,8 @@ from typing import Any
 from django.conf import settings
 from django.utils import timezone as tz
 
+from tasks.models import StopTime, QuerySet
+
 
 
 logger = getLogger('core_services')
@@ -108,10 +110,10 @@ def delete_session(session_id: str) -> bool:
 
 
 @redis_operation
-def set_cached(prefix: str, key: str, value: dict | str, *, is_json: bool = False) -> int:
+def set_cached(prefix: str, key: str, value: dict | str, *, is_json: bool = False, ex: int | None = None) -> int:
     key = f'{prefix}:{key}'
     value = json.dumps(value) if is_json else value
-    return redis_client.set(key, value)
+    return redis_client.set(key, value, ex=ex)
 
 
 def set_cached_trip(trip_id:str, trip_data:dict[str, Any]):
@@ -123,6 +125,9 @@ def set_cached_subroute(start_id:str, end_id:str, value:str) -> int:
 
 def set_cached_route(trip_id:str, value:str) -> int:
     return set_cached('route', trip_id, value)
+
+def set_cached_stop_real_stop_times(stop_id:str, data:list[dict]) -> int:
+    return set_cached('real_stop_times', stop_id, data, is_json=True)
 
 
 @redis_operation
@@ -143,6 +148,9 @@ def get_cached_subroute(start_id:str, end_id:str) -> str | None:
 
 def get_cached_route(trip_id:str) -> str | None:
     return get_cached('route', trip_id)
+
+def get_cached_stop_real_stop_times(stop_id:str) -> list[dict[str, Any]]:
+    return get_cached('real_stop_times', stop_id, is_json=True)
 
 
 @redis_operation
@@ -172,8 +180,14 @@ def truncate_cached_subroutes() -> int:
 def truncate_cached_routes() -> int:
     return truncate_cached('route:*')
 
+def truncate_cached_stop_real_stop_times() -> int:
+    return truncate_cached('real_stop_times:*')
+
+
 def truncate_gtfs_related_cached_data() -> int:
-    return truncate_cached_trips() + truncate_cached_routes()
+    return truncate_cached_trips() \
+        + truncate_cached_routes() \
+        + truncate_cached_stop_real_stop_times()
 
 def truncate_map_related_cached_data() -> int:
     return truncate_cached_routes()

@@ -5,6 +5,10 @@ from django.utils import timezone as tz
 from tasks.models import *
 from trips.models import CompleteTrip
 from trips.services.serializers import build_trip_stop_times
+from core.services.redis import (
+    get_cached_stop_real_stop_times,
+    set_cached_stop_real_stop_times
+)
 
 
 def get_all_stops():
@@ -39,6 +43,11 @@ def get_real_stop_times_datetimes(stop_times: QuerySet[StopTime]) -> list[dict]:
 
         return real_date, real_arr_time, real_dep_time
     
+    print(stop_times[0])
+    stop_id = stop_times[0]['stop_id']
+    if (cached:= get_cached_stop_real_stop_times(stop_id)):
+        return cached
+    
     real_stop_times = []
     for st in stop_times:
         real_date, real_arr_time, real_dep_time = get_real_datetime(st)
@@ -50,13 +59,14 @@ def get_real_stop_times_datetimes(stop_times: QuerySet[StopTime]) -> list[dict]:
             'date': real_date,
         })
 
+    set_cached_stop_real_stop_times(stop_id, real_stop_times)
     return real_stop_times
 
 
 def get_stop_schedule(stop_id:str, direction:str, date_:date, time_:time) -> QuerySet[StopTime] :
     stop_times = StopTime.objects \
         .filter(stop__stop_id=stop_id) \
-        .values('id', 'arrival_time', 'departure_time', 'trip_id')
+        .values('id', 'arrival_time', 'departure_time', 'trip_id', 'stop_id')
     
     st_real_datetimes = get_real_stop_times_datetimes(stop_times)
     needed_time = 'departure_time' if direction == 'departures' else 'arrival_time' 
