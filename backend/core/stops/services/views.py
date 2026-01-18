@@ -1,13 +1,16 @@
 from datetime import date, time 
+from typing import NamedTuple
 
 from django.utils import timezone as tz
 
-from tasks.models import *
+from tasks.models import QuerySet, Stop, StopTime 
 from trips.models import CompleteTrip
 from trips.services.serializers import build_trip_stop_times
 from core.services.redis import (
     get_cached_stop_real_stop_times,
-    set_cached_stop_real_stop_times
+    get_cached_stop_schedule,
+    set_cached_stop_real_stop_times,
+    set_cached_stop_schedule,
 )
 
 
@@ -19,14 +22,15 @@ def get_stop(stop_id):
     return Stop.objects.get(stop_id=stop_id)
 
 
+def normalize_time(time_str: str) -> str:
+    h, m, s = map(int, time_str.split(':'))
+    while h > 23:
+        h -= 24
+    return f'{h:02d}:{m:02d}:{s:02d}'
+
+
 def get_real_stop_times_datetimes(stop_times: QuerySet[StopTime]) -> list[dict]:
     def get_real_datetime(st: dict) -> tuple[str, str, str]:
-        def normalize_time(time_str: str) -> str:
-            h, m, s = map(int, time_str.split(':'))
-            while h > 23:
-                h -= 24
-            return f'{h:02d}:{m:02d}:{s:02d}'
-
         trip_id = st['trip_id']
         date_str = trip_id.split('_')[0]
         date_ = tz.datetime.strptime(date_str, '%Y-%m-%d')
@@ -43,7 +47,6 @@ def get_real_stop_times_datetimes(stop_times: QuerySet[StopTime]) -> list[dict]:
 
         return real_date, real_arr_time, real_dep_time
     
-    print(stop_times[0])
     stop_id = stop_times[0]['stop_id']
     if (cached:= get_cached_stop_real_stop_times(stop_id)):
         return cached
@@ -63,34 +66,81 @@ def get_real_stop_times_datetimes(stop_times: QuerySet[StopTime]) -> list[dict]:
     return real_stop_times
 
 
-def get_stop_schedule(stop_id:str, direction:str, date_:date, time_:time) -> QuerySet[StopTime] :
+class ScheduleStopTimeNT(NamedTuple):
+    id_: int
+    trip_id: str
+    time_: str
+
+
+def get_stop_schedule_stop_time_ids(stop_id:str, direction:str, date_:date, time_:time) -> list[int]:
+    date_str = date_.strftime('%Y-%m-%d')
+    time_str = time_.strftime('%H:%M:%S')
+    
+    if (cached := get_cached_stop_schedule(stop_id, direction, date_str, time_str)):
+        return cached
+    
     stop_times = StopTime.objects \
         .filter(stop__stop_id=stop_id) \
         .values('id', 'arrival_time', 'departure_time', 'trip_id', 'stop_id')
     
     st_real_datetimes = get_real_stop_times_datetimes(stop_times)
-    needed_time = 'departure_time' if direction == 'departures' else 'arrival_time' 
-    date_str = date_.strftime('%Y-%m-%d')
-    time_str = time_.strftime('%H:%M:%S')
+    needed_time = 'departure_time' if direction == 'departures' else 'arrival_time'
+     
+    prev_st = ScheduleStopTimeNT(None, None, '00:00:00')   # for calculating time range of the schedule relevance and future caching
+    sts_filtered_by_datetime = []
+    
+    for st in st_real_datetimes:
+        if st['date'] == date_str:
+            if st[needed_time] >= time_str:
+                t = ScheduleStopTimeNT(st['id'], st['trip_id'], st[needed_time])
+                sts_filtered_by_datetime.append(t)
+            else:
+                if st[needed_time] > prev_st.time_:
+                    prev_st = ScheduleStopTimeNT(st['id'], st['trip_id'], st[needed_time])
+    
+    
+    
+    if (prev_exists := bool(prev_st.id_)):
+        sts_filtered_by_datetime.insert(0, prev_st)
 
-    filtered_stop_times_trip_ids = [
-        (st['id'], st['trip_id']) for st in st_real_datetimes
-        if st['date'] == date_str and st[needed_time] >= time_str
-    ]
-
-    filtered_stop_time_ids = [] 
+    sts_filtered_by_stop_sq = [] 
     pos = 0 if direction == 'arrivals' else -1
     
-    for st_id, trip_id in filtered_stop_times_trip_ids:
-        complete_trip = CompleteTrip.objects.get(trip_ids__contains=[trip_id])
+    for st in sts_filtered_by_datetime:
+        complete_trip = CompleteTrip.objects.get(trip_ids__contains=[st.trip_id])
         ct_stop_times = build_trip_stop_times(complete_trip)
         
         if ct_stop_times[pos].stop.stop_id != stop_id:
-            filtered_stop_time_ids.append(st_id)
+            sts_filtered_by_stop_sq.append(st)
 
-    schedule = StopTime \
-        .objects \
-        .filter(pk__in=filtered_stop_time_ids) \
+    prev_in_schedule = any(prev_st.id_ == st.id_ for st in sts_filtered_by_stop_sq)
+    if not (prev_exists and prev_in_schedule):
+        start_time = time_str
+        end_pos = 0
+    else:
+        start_time = prev_st.time_
+        end_pos = 1
+
+
+    end_time = sts_filtered_by_stop_sq[end_pos].time_
+    end_time = normalize_time(end_time)
+
+    stop_time_ids = [st.id_ for st in sts_filtered_by_stop_sq]
+
+    set_cached_stop_schedule(
+        stop_id, direction, date_str, 
+        start_time, end_time, stop_time_ids,
+    )
+
+    return stop_time_ids
+
+
+def get_stop_schedule(stop_id:str, direction:str, date_:date, time_:time) -> QuerySet[StopTime]:
+    needed_time = 'departure_time' if direction == 'departures' else 'arrival_time'
+    stop_time_ids = get_stop_schedule_stop_time_ids(stop_id, needed_time, date_, time_)
+        
+    schedule = StopTime.objects \
+        .filter(pk__in=stop_time_ids) \
         .order_by(needed_time)
-    
+
     return schedule
