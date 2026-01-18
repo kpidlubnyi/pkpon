@@ -1,4 +1,4 @@
-from collections import Counter, defaultdict
+from collections import Counter
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from stops.serializers import BaseStopTimeSerializer
@@ -78,68 +78,39 @@ class BaseCompleteTripSerializer(ModelSerializer):
         return self._trips_cache
     
     def _stop_times_by_trip(self, obj: CompleteTrip) -> dict[str, list[StopTime]]:
-        if not hasattr(self, '_stop_times_by_trip_cache'):
-            stop_times = (
-                StopTime.objects
-                .filter(trip_id__in=obj.trip_ids)
-                .select_related()
-                .order_by('trip_id', 'stop_sequence')
-            )
-
-            d = defaultdict(list)
-            for st in stop_times:
-                d[st.trip_id].append(st)
-
-            self._stop_times_by_trip_cache = d
-
-        return self._stop_times_by_trip_cache    
+        return get_stop_times_by_trip(obj)    
     
-    def _values(self, obj, key):
+    def _values(self, obj:CompleteTrip, key:str) -> list[Any]:
         return [trip[key] for trip in self._trips(obj) if trip[key] is not None]
 
-    def _most_common(self, obj, key):
+    def _most_common(self, obj:CompleteTrip, key:str) -> Any:
         values = self._values(obj, key)
         if not values:
             return None
         return Counter(values).most_common(1)[0][0]
 
-    def get_legs(self, obj) -> int:
+    def get_legs(self, obj:CompleteTrip) -> int:
         return len(self._trips(obj))
 
-    def get_trip_headsign(self, obj) -> str | None:
+    def get_trip_headsign(self, obj:CompleteTrip) -> str | None:
         return self._most_common(obj, 'trip_headsign')
 
-    def get_trip_short_name(self, obj) -> str | None:
+    def get_trip_short_name(self, obj:CompleteTrip) -> str | None:
         return self._most_common(obj, 'trip_short_name')
 
-    def get_plk_train_number(self, obj) -> str | None:
+    def get_plk_train_number(self, obj:CompleteTrip) -> str | None:
         return self._most_common(obj, 'plk_train_number')
 
-    def get_carriages(self, obj) -> list:
+    def get_carriages(self, obj:CompleteTrip) -> list:
         return list(set(self._values(obj, 'carriages')))
 
-    def get_routes(self, obj) -> list:
+    def get_routes(self, obj:CompleteTrip) -> list:
         return list(set(self._values(obj, 'route_id')))
     
-    def get_trip_stop_times(self, obj: CompleteTrip):
-        l = len(obj.trip_ids)
-        stop_times_by_trip = self._stop_times_by_trip(obj)
-
-        stop_times = []
-        for i, trip_id in enumerate(obj.trip_ids):
-            trip_stop_times = stop_times_by_trip[trip_id]
-            st_l = len(trip_stop_times)
-
-            lim = st_l - 1 if i != l else st_l
-
-            serialized = BaseStopTimeSerializer(trip_stop_times[:lim], many=True).data
-            stop_times.extend(serialized)
-
-        for i, stop_time in enumerate(stop_times):
-            stop_time['stop_sequence'] = i
-
-        return stop_times
-    
+    def get_trip_stop_times(self, obj:CompleteTrip):
+        stop_times = build_trip_stop_times(obj)
+        return BaseStopTimeSerializer(stop_times, many=True).data  
+  
     def get_polylines(self, obj:CompleteTrip):
         return get_complete_trip_polylines(obj.trip_ids, self._stop_times_by_trip(obj))
 

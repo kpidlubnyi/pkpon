@@ -1,12 +1,12 @@
 import redis
 import json
 import uuid
+from datetime import datetime
 from logging import getLogger
 from typing import Any
 
 from django.conf import settings
 from django.utils import timezone as tz
-
 
 
 logger = getLogger('core_services')
@@ -70,7 +70,7 @@ def create_session(user) -> str | None:
     session_data = {
         'user_id': str(user.user_id),
         'email': user.email,
-        'created_at': tz.now().isoformat(),
+        'created_at': tz.localtime().isoformat(),
     }
     
     try:
@@ -108,10 +108,10 @@ def delete_session(session_id: str) -> bool:
 
 
 @redis_operation
-def set_cached(prefix: str, key: str, value: dict | str, *, is_json: bool = False) -> int:
+def set_cached(prefix: str, key: str, value: dict | str, *, is_json: bool = False, ex: int | None = None) -> int:
     key = f'{prefix}:{key}'
     value = json.dumps(value) if is_json else value
-    return redis_client.set(key, value)
+    return redis_client.set(key, value, ex=ex)
 
 
 def set_cached_trip(trip_id:str, trip_data:dict[str, Any]):
@@ -123,6 +123,34 @@ def set_cached_subroute(start_id:str, end_id:str, value:str) -> int:
 
 def set_cached_route(trip_id:str, value:str) -> int:
     return set_cached('route', trip_id, value)
+
+def set_cached_stop_real_stop_times(stop_id:str, data:list[dict]) -> int:
+    return set_cached('real_stop_times', stop_id, data, is_json=True)
+
+def set_cached_stop_schedule(
+    stop_id: str, direction: str, date_: str, 
+    from_time: str, to_time: str, data:list[dict],
+) -> int:
+    def calculate_time_range(from_t: str, to_t: str) -> int:
+        fmt = "%H:%M:%S"
+        start = datetime.strptime(from_t, fmt)
+        end = datetime.strptime(to_t, fmt)
+        delta = (end - start).total_seconds()
+        return max(0, int(delta))
+
+    key = f'{stop_id}:{direction}:{date_}:{from_time}-{to_time}'
+    ex = calculate_time_range(from_time, to_time)
+
+    pattern = f'schedule:{stop_id}:{direction}:{date_}:*'
+    for k in redis_client.scan_iter(match=pattern):
+        *_, tr = k.split(':',maxsplit=4)
+        k_to_time = tr.split('-')[1]
+
+        if to_time == k_to_time:
+            redis_client.delete(k)
+            break
+        
+    return set_cached('schedule', key, data, is_json=True, ex=ex)
 
 
 @redis_operation
@@ -143,6 +171,23 @@ def get_cached_subroute(start_id:str, end_id:str) -> str | None:
 
 def get_cached_route(trip_id:str) -> str | None:
     return get_cached('route', trip_id)
+
+def get_cached_stop_real_stop_times(stop_id:str) -> list[dict[str, Any]] | None:
+    return get_cached('real_stop_times', stop_id, is_json=True)
+
+def get_cached_stop_schedule(stop_id: str, direction: str, date_: str, time_: str) -> list[dict] | None:
+    pattern = f'schedule:{stop_id}:{direction}:{date_}:*'
+
+    for key in  redis_client.scan_iter(match=pattern):
+        _, k_s, k_dr, k_dt, k_tr = key.split(':', maxsplit=4)
+        key_ft, key_tt = k_tr.split('-', 1)
+
+        if key_ft <= time_ <= key_tt:
+            cache_key = f'{k_s}:{k_dr}:{k_dt}:{k_tr}'
+            return get_cached('schedule', cache_key, is_json=True)
+
+    return None
+
 
 
 @redis_operation
@@ -172,8 +217,18 @@ def truncate_cached_subroutes() -> int:
 def truncate_cached_routes() -> int:
     return truncate_cached('route:*')
 
+def truncate_cached_stop_real_stop_times() -> int:
+    return truncate_cached('real_stop_times:*')
+
+def truncate_cached_schedules() -> int:
+    return truncate_cached('schedule:*')
+
+
 def truncate_gtfs_related_cached_data() -> int:
-    return truncate_cached_trips() + truncate_cached_routes()
+    return truncate_cached_trips() \
+        + truncate_cached_routes() \
+        + truncate_cached_stop_real_stop_times() \
+        + truncate_cached_schedules()
 
 def truncate_map_related_cached_data() -> int:
     return truncate_cached_routes()
