@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import LocationMarker from "../MyLocation/LocationMarker.tsx";
 import { MarkerClusters } from "../MarkerClusters/MarkerClusters.tsx";
@@ -17,6 +17,7 @@ export const Map = ({ stops }: MapProps) => {
   return (
     <div style={{ position: "relative" }}>
       <MapContainer
+        zoomControl={false}
         scrollWheelZoom
         center={[52.049, 19.204]}
         zoom={6.4}
@@ -33,6 +34,7 @@ export const Map = ({ stops }: MapProps) => {
         {!hasRoute && <MarkerClusters />}
         {hasRoute && <RouteLayer />} */}
         <MarkerClusters stops={stops} />
+        <ZoomControl position="bottomright" />
       </MapContainer>
     </div>
   );

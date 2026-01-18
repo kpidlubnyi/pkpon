@@ -1,11 +1,6 @@
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-  --primary: #4681FF
+* {
+  box-sizing: border-box;
 }
-
 .me-locate {
   background-color: blue;
   border-radius: 50%;
@@ -13,3 +8,46 @@ body,
   height: 60px;
   width: 60px;
 }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* colors */
+  --primary-blue: #3A62FF;
+  --primary-hover: #0746d9;
+
+  --gray: #808080;
+  --gray-lighter: #AEAEAE;
+  --gray-light: #D2D2D2;
+  --accent-light: #E2E2E2;
+
+  --font-family: 'Zalando Sans Expanded', sans-serif;
+
+
+  --font-sm: 12px;
+  --font-md: 14px;
+  --font-lg: 16px;
+  --font-size-xl: 18px;
+
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-bold: 700;
+
+  --winter-gradient: linear-gradient(to right, #8db1cc, #e2e9ea);
+  --shadow: 0 10px 4px -1px rgba(0, 0, 0, 0.25);
+
+  --title: 24px;
+  --subtitle: 16px;
+  --body: 14px;
+}
+
+

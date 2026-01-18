@@ -1,0 +1,36 @@
+/* cluster.css */
+.cluster {
+    background: #4681FF;
+    border: 2px solid #284CC3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 2px 3px 2px rgba(0, 0, 0, 0.45);
+    font-weight: bold;
+}
+
+.cluster--sm {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+}
+
+.cluster--md {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+}
+
+.cluster--lg {
+    width: 39px;
+    height: 39px;
+    font-size: 18px;
+}
+
+.cluster--xl {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+}

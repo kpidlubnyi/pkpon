@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { authAPI } from '../services/api';
+import { authAPI } from '../services/authService.ts';
 import type {
   User,
   RegisterData,
   LoginData,
-} from '../types';
+} from '../types.ts';
 import axios from 'axios';
 
 interface AuthResult {
@@ -13,11 +13,9 @@ interface AuthResult {
 }
 
 interface DRFValidationError {
-  [key: string]: string[] | string | undefined; // тепер error:string теж підходить
+  [key: string]: string[] | string | undefined; 
   non_field_errors?: string[];
 }
-
-
 
 interface AuthState {
   user: User | null;
@@ -32,7 +30,7 @@ interface AuthState {
   setShowAuthModal: (value: boolean) => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useUserStore = create<AuthState>((set, get) => ({
   user: null,
   loading: true,
   showAuthModal: false,
