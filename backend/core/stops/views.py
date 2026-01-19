@@ -12,13 +12,6 @@ class AllStopsView(APIView):
         return JsonResponse({'stops': serialized}, status=status.HTTP_200_OK)
     
 
-class StopView(APIView):
-    def get(self, request, stop_id):
-        stop = get_stop(stop_id)
-        serialized = StopDetailedSerializer(stop).data
-        return JsonResponse(serialized, status=status.HTTP_200_OK)
-    
-
 class StopScheduleView(APIView):
     def get(self, request, stop_id):
         srl = StopScheduleSerializer(data=request.query_params)
