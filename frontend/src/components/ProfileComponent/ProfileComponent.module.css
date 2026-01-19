@@ -1,0 +1,60 @@
+.profile-container  {
+    position: relative;
+    top: -10px;
+    right: 310px;
+    width: 320px;
+    padding: 20px 16px;
+    border-radius: 26px;
+    box-shadow: 0 10px 4px -1px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--winter-gradient);
+    cursor: default;
+}
+
+.profile-content {
+    font-family: var(--font-family);
+    padding: 16px;
+    gap: 16px;
+    border-radius: 26px;
+    box-shadow: 0 10px 4px -1px rgba(0, 0, 0, 0.25);
+    background: #fffafa6b;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-title {
+    margin-bottom: 4px;
+    font-size: var(--subtitle);
+    font-weight: var(--font-medium);
+    background-color: var(--primary-blue);
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 20px;
+    color: white;
+}
+
+.username-content {
+    display: block;
+    padding-left: 12px;
+    font-size: var(--subtitle);
+    font-weight: var(--font-regular);
+}
+
+.logout-btn {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+.logout {
+    margin-top: 30px;
+}
+
+.logout-icon {
+    fill: var(--primary-blue);
+    stroke: white;
+}

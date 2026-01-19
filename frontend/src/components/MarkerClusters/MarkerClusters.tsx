@@ -10,7 +10,7 @@ import type { Stop } from "../../types/mapTypes.ts";
 
 
 type MarkerClusterProps = {
-  stops: Stop[];
+  stops: Stop[]; 
 }
 export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
   const map = useMap();
@@ -44,7 +44,7 @@ export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
               permanent={zoomed >= 12}
               direction="top"
               className="station-tooltip"
-              offset={[0, -12]}
+              offset={[1, -6]}
             >
               <strong>{stop.stop_name}</strong>
             </Tooltip>

@@ -1,0 +1,49 @@
+.auth-toggle-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.toggle-wrapper {
+    box-shadow: var(--shadow);
+    position: relative;
+    display: flex;
+    background: #eee;
+    border-radius: 26px;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    font-family: var(--font-family);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    z-index: 1;
+    position: relative;
+    color: #000;
+    transition: color 0.3s;
+}
+
+.toggle-highlight {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    bottom: 0;
+    width: 140px;
+    height: 32px;
+    background: var(--primary-blue);
+    border-radius: 26px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+.toggle-btn {
+    color: #000;
+    transition: color 0.3s;
+}
+
+.active {
+    color: #fff;
+}

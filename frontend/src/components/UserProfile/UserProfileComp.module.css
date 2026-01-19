@@ -1,0 +1,21 @@
+.user-info {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    z-index: 999;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+.panel {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.show {
+    opacity: 1;
+    max-height: 500px;
+    /* або auto, але не у всіх браузерах працює */
+}

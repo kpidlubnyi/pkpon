@@ -1,5 +1,5 @@
 .station-tooltip {
-    background:#284CC3;
+    background: #284CC3;
     border-radius: 16px;
     padding: 6px 10px;
     font-size: 12px;
@@ -7,10 +7,22 @@
     color: white;
     box-shadow: 2px 3px 2px rgba(0, 0, 0, 0.45);
     border: none;
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.leaflet-tooltip {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.leaflet-tooltip.leaflet-tooltip-open {
+    opacity: 1;
 }
 
 .station-tooltip::before,
 .station-tooltip::after,
 .leaflet-tooltip-arrow {
-    display: none ;
+    display: none;
 }
