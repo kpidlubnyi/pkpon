@@ -38,20 +38,6 @@ class BaseStopSerializer(serializers.ModelSerializer):
         )
 
 
-class StopDetailedSerializer(BaseStopSerializer, serializers.ModelSerializer):
-    schedule = serializers.SerializerMethodField()
-
-    def get_schedule(self, obj:Stop):
-        now = tz.localtime()
-        stop_schedule = get_stop_schedule(obj.stop_id, 'departures', now.date(), now.time())  
-        return BaseStopTimeSerializer(stop_schedule, many=True).data
-
-    class Meta(BaseStopSerializer.Meta):
-        fields = BaseStopSerializer.Meta.fields + (
-            'schedule',
-        )
-
-
 class BaseStopTimeSerializer(serializers.ModelSerializer):
     stop = BaseStopSerializer()
     
