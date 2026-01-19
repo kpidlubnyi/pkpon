@@ -18,39 +18,6 @@ class BaseRouteSerializers(ModelSerializer):
         )
 
 
-class BaseTripSerializer(ModelSerializer):
-    trip_stop_times = SerializerMethodField()
-    route = BaseRouteSerializers()
-    polyline = SerializerMethodField()
-
-    def _stop_times(self, obj:Trip) -> list[StopTime]:
-        if not hasattr(self, '_stop_times_cache'):
-            self._stop_times_cache = StopTime.objects.filter(trip_id=obj.trip_id).select_related()
-        return self._stop_times_cache
-    
-    def get_trip_stop_times(self, obj:Trip) -> list[dict]:
-        stop_times = self._stop_times(obj)
-        serialized = BaseStopTimeSerializer(stop_times, many=True).data
-        return serialized 
-    
-    def get_polyline(self, obj:Trip):
-        return get_trip_polyline(self._stop_times(obj))
-        
-
-    class Meta:
-        model = Trip
-        fields = (
-            'route',
-            'trip_id',
-            'trip_headsign',
-            'trip_short_name',
-            'plk_train_number',
-            'carriages',
-            'polyline',
-            'trip_stop_times',
-        )
-
-
 class BaseCompleteTripSerializer(ModelSerializer):
     trip_stop_times = SerializerMethodField()
     trip_short_name = SerializerMethodField()
