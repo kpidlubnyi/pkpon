@@ -3,7 +3,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from trips.services.views import get_trip, find_matching_trips
-from trips.serializers import UserTripSearchSerializer, BaseCompleteTripSerializer
+from trips.serializers import (
+    UserTripSearchSerializer, UserTripSearchCompleteTripSerializer
+)
 
 
 class TripView(APIView):
@@ -30,6 +32,14 @@ class UserTripsView(APIView):
         to_stop = q_params['to_stop']
 
         matching_trips = find_matching_trips(from_stop, to_stop, date, time)
-        serialized = BaseCompleteTripSerializer(matching_trips, many=True).data
+        serialized = UserTripSearchCompleteTripSerializer(
+            matching_trips, 
+            context= {
+                'from_stop': from_stop,
+                'to_stop': to_stop,
+            },
+            many=True
+        ).data
+        serialized.sort(key=lambda x: x['departure_stop_time']['departure_time'])
 
         return JsonResponse({'matching_trips': serialized}, status=status.HTTP_200_OK)

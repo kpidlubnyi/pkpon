@@ -1,7 +1,7 @@
 from collections import Counter
 
 from rest_framework import serializers
-from stops.serializers import PolylineStopTimeSerializer, StopTimeSerializer
+from stops.serializers import PolylineStopTimeSerializer, StopTimeSerializer, ScheduleStopTimeSerializer
 from tasks.models import Route, Trip, Transfer
 from trips.models import CompleteTrip
 from trips.services.serializers import *
@@ -118,6 +118,39 @@ class BaseCompleteTripSerializer(serializers.ModelSerializer):
             'carriages',
             'polylines',
             'trip_stop_times',
+        )
+
+
+class UserTripSearchCompleteTripSerializer(BaseCompleteTripSerializer):
+    departure_stop_time = serializers.SerializerMethodField()
+    arrival_stop_time = serializers.SerializerMethodField()
+
+    def _find_needed_stop_time(self, obj, stop_id):
+        return (
+            StopTime.objects
+            .filter(trip_id__in=obj.trip_ids, stop__stop_id=stop_id)
+            .select_related('stop')
+            .order_by('stop_sequence')
+            .first()
+        )
+    
+    def get_departure_stop_time(self, obj:CompleteTrip) -> dict:
+        from_stop = self.context.get('from_stop')
+        from_stop_time = self._find_needed_stop_time(obj, from_stop)
+        return ScheduleStopTimeSerializer(from_stop_time).data
+    
+    def get_arrival_stop_time(self, obj:CompleteTrip) -> dict:
+        to_stop = self.context.get('to_stop')
+        to_stop_time = self._find_needed_stop_time(obj, to_stop)
+        return ScheduleStopTimeSerializer(to_stop_time).data
+
+    class Meta(BaseCompleteTripSerializer.Meta):
+        fields = (
+            'routes',
+            'legs',
+            'plk_train_number',
+            'departure_stop_time',
+            'arrival_stop_time',
         )
 
 
