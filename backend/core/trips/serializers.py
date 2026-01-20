@@ -1,13 +1,13 @@
 from collections import Counter
 
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework import serializers
 from stops.serializers import PolylineStopTimeSerializer, StopTimeSerializer
 from tasks.models import Route, Trip, Transfer
 from trips.models import CompleteTrip
 from trips.services.serializers import *
 
 
-class BaseRouteSerializers(ModelSerializer):
+class BaseRouteSerializers(serializers.ModelSerializer):
     class Meta:
         model = Route
         fields = (
@@ -17,7 +17,7 @@ class BaseRouteSerializers(ModelSerializer):
             'route_type',
         )
 
-class BaseTransferSerializer(ModelSerializer):
+class BaseTransferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfer
         fields = (
@@ -26,17 +26,17 @@ class BaseTransferSerializer(ModelSerializer):
             'to_trip_id',
         )
 
-class BaseCompleteTripSerializer(ModelSerializer):
-    trip_short_name = SerializerMethodField()
-    trip_route_name = SerializerMethodField()
-    trip_headsign = SerializerMethodField()
-    routes = SerializerMethodField()
-    legs = SerializerMethodField()
-    transfers = SerializerMethodField()
-    plk_train_number = SerializerMethodField()
-    carriages = SerializerMethodField()
-    polylines = SerializerMethodField()
-    trip_stop_times = SerializerMethodField()
+class BaseCompleteTripSerializer(serializers.ModelSerializer):
+    trip_short_name = serializers.SerializerMethodField()
+    trip_route_name = serializers.SerializerMethodField()
+    trip_headsign = serializers.SerializerMethodField()
+    routes = serializers.SerializerMethodField()
+    legs = serializers.SerializerMethodField()
+    transfers = serializers.SerializerMethodField()
+    plk_train_number = serializers.SerializerMethodField()
+    carriages = serializers.SerializerMethodField()
+    polylines = serializers.SerializerMethodField()
+    trip_stop_times = serializers.SerializerMethodField()
 
     def _trips(self, obj:CompleteTrip) -> list[dict]:
         if not hasattr(self, '_trips_cache'):
@@ -119,3 +119,21 @@ class BaseCompleteTripSerializer(ModelSerializer):
             'polylines',
             'trip_stop_times',
         )
+
+
+class UserTripSearchSerializer(serializers.Serializer):
+    date = serializers.DateField(required=False, allow_null=True)
+    time = serializers.TimeField(required=False, allow_null=True)
+    from_stop = serializers.CharField()
+    to_stop = serializers.CharField()
+
+    def validate(self, attrs):
+        now = tz.localtime()
+
+        if not attrs.get('date'):
+            attrs['date'] = now.date()
+
+        if not attrs.get('time'):
+            attrs['time'] = now.time()
+
+        return attrs
