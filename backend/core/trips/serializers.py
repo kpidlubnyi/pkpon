@@ -1,7 +1,7 @@
 from collections import Counter
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from stops.serializers import BaseStopTimeSerializer
+from stops.serializers import PolylineStopTimeSerializer, StopTimeSerializer
 from tasks.models import Route, Trip, Transfer
 from trips.models import CompleteTrip
 from trips.services.serializers import *
@@ -95,13 +95,13 @@ class BaseCompleteTripSerializer(ModelSerializer):
     
     def get_trip_stop_times(self, obj: CompleteTrip) -> dict:
         stop_times = get_complete_trip_stop_times(obj)
-        serialized = BaseStopTimeSerializer(stop_times, many=True).data
+        serialized = StopTimeSerializer(stop_times, many=True).data
         trip_stop_times = get_ordered_complete_trip_st(obj.trip_ids, serialized)
         return trip_stop_times
 
     def get_polylines(self, obj:CompleteTrip) -> list[str]:
         stop_times = get_complete_trip_stop_times(obj)
-        serialized = BaseStopTimeSerializer(stop_times, many=True).data
+        serialized = PolylineStopTimeSerializer(stop_times, many=True).data
         trip_stop_times = get_ordered_complete_trip_st(obj.trip_ids, serialized)
         return get_complete_trip_polylines(trip_stop_times)
 
