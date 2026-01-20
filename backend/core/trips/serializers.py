@@ -2,7 +2,7 @@ from collections import Counter
 
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from stops.serializers import BaseStopTimeSerializer
-from tasks.models import Route, Trip
+from tasks.models import Route, Trip, Transfer
 from trips.models import CompleteTrip
 from trips.services.serializers import *
 
@@ -17,6 +17,14 @@ class BaseRouteSerializers(ModelSerializer):
             'route_type',
         )
 
+class BaseTransferSerializer(ModelSerializer):
+    class Meta:
+        model = Transfer
+        fields = (
+            'transfer_type',
+            'from_trip_id',
+            'to_trip_id',
+        )
 
 class BaseCompleteTripSerializer(ModelSerializer):
     trip_short_name = SerializerMethodField()
@@ -24,6 +32,7 @@ class BaseCompleteTripSerializer(ModelSerializer):
     trip_headsign = SerializerMethodField()
     routes = SerializerMethodField()
     legs = SerializerMethodField()
+    transfers = SerializerMethodField()
     plk_train_number = SerializerMethodField()
     carriages = SerializerMethodField()
     polylines = SerializerMethodField()
@@ -77,6 +86,13 @@ class BaseCompleteTripSerializer(ModelSerializer):
     def get_routes(self, obj:CompleteTrip) -> list:
         return self._values(obj, 'route_id')
     
+    def get_transfers(self, obj:CompleteTrip) -> list:
+        transfers = [
+            Transfer.objects.get(from_trip_id=from_trip)    
+            for from_trip in obj.trip_ids[:-1]
+        ]
+        return  BaseTransferSerializer(transfers, many=True).data
+    
     def get_trip_stop_times(self, obj: CompleteTrip) -> dict:
         stop_times = get_complete_trip_stop_times(obj)
         serialized = BaseStopTimeSerializer(stop_times, many=True).data
@@ -97,6 +113,7 @@ class BaseCompleteTripSerializer(ModelSerializer):
             'trip_headsign',
             'routes',
             'legs',
+            'transfers',
             'plk_train_number',
             'carriages',
             'polylines',
