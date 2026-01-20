@@ -2,8 +2,10 @@ import axios from "axios";
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import type { AuthResponse, LoginData, LogoutResponse, RegisterData, UserProfileResponse } from "../types";
 
+export const backendUrl = import.meta.env.VITE_BACKEND_URL
+
 export const api: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8001/',
+    baseURL: backendUrl,
     withCredentials: true,
     headers: {
         "Content-Type": 'application/json',
