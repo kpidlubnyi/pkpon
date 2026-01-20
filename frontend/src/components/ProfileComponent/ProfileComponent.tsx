@@ -1,6 +1,6 @@
 import type { User } from '../../types';
 import css from './ProfileComponent.module.css';
-import LogoutIcon from '../../assets/logout.svg';
+import LogoutIcon from '../../assets/icons/logout.svg';
 
 interface ProfileComponentProps {
     user: User;

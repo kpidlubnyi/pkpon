@@ -1,4 +1,4 @@
-import type { Stop } from "../types/mapTypes";
+import type { Stop } from "../types";
 import {api} from './authService'
 
 export const getStops = async (): Promise<{stops: Stop[]}> => {

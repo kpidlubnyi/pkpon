@@ -17,5 +17,14 @@
 .show {
     opacity: 1;
     max-height: 500px;
-    /* або auto, але не у всіх браузерах працює */
 }
+
+.user-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--winter-gradient);
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+};

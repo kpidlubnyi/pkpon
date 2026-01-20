@@ -1,5 +1,5 @@
 import css from "./UserProfileComp.module.css"
-import UserIcon from "../../assets/profile-button.svg"
+import UserIcon from "../../assets/icons/profile-button.svg?react"
 import { useEffect, useState } from "react";
 import { useUserStore } from "../../store/UserStore";
 import { AuthComponent } from "../AuthComponent/AuthComponent";
@@ -33,8 +33,8 @@ export const UserProfileComp = () => {
 
     return (
         <div className={css['user-info']}>
-            <div onClick={handleClick}>
-                <img src={UserIcon} alt="user information" width={60} height={60} />
+            <div onClick={handleClick} className={css["user-icon"]}>
+                <UserIcon width={60} height={60} className={css["icon-svg"]} />
             </div>
             {panelMode === 'auth' && <AuthComponent />}
             {panelMode === 'profile' &&  user && (<ProfileComponent user={user} onLogout={() => void handleLogout()} />)}
