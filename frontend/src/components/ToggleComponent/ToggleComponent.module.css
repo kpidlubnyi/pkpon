@@ -7,7 +7,7 @@
     box-shadow: var(--shadow);
     position: relative;
     display: flex;
-    background: #eee;
+    background: #eeeeeea7;
     border-radius: 26px;
     overflow: hidden;
 }
@@ -41,7 +41,7 @@
 
 .toggle-btn {
     color: #000;
-    transition: color 0.3s;
+    transition: color 0.3s ease-in-out;
 }
 
 .active {

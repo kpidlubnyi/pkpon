@@ -4,15 +4,16 @@ import LocationMarker from "../MyLocation/LocationMarker.tsx";
 import { MarkerClusters } from "../MarkerClusters/MarkerClusters.tsx";
 import {LocateButton} from "../LocateButton/LocateButton.tsx";
 import { useState } from "react";
-import type { Stop } from "../../types/mapTypes";
 import type { LatLng } from "leaflet";
+import { useStopsStore } from "../../store/StationStore.tsx";
+import { MapController } from "../MapController/MapController.tsx";
 
-type MapProps = {
-  stops: Stop[];
-};
 
-export const Map = ({ stops }: MapProps) => {
+export const Map = () => {
   const [position, setPosition] = useState<LatLng | null>(null);
+  const {stops} = useStopsStore()
+
+
 
   return (
     <div style={{ position: "relative" }}>
@@ -33,6 +34,7 @@ export const Map = ({ stops }: MapProps) => {
         {/* 
         {!hasRoute && <MarkerClusters />}
         {hasRoute && <RouteLayer />} */}
+        <MapController/>
         <MarkerClusters stops={stops} />
         <ZoomControl position="bottomright" />
       </MapContainer>

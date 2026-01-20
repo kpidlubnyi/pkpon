@@ -1,5 +1,5 @@
 import './LocateButton.css'
-import LocateIcon from '../../assets/locate-icon.svg'
+import LocateIcon from '../../assets/icons/locate-icon.svg'
 import { useMap, useMapEvents } from 'react-leaflet'
 import type { LatLng } from 'leaflet'
 

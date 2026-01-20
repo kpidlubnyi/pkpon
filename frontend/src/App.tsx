@@ -1,12 +1,13 @@
 import { Map } from "./components/Map/Map.js";
 import { getStops } from "../src/services/mapService.js";
-import { useEffect, useState } from "react";
-import type { Stop } from "./types/mapTypes.js";
+import { useEffect } from "react";
 import { UserProfileComp } from "./components/UserProfile/UserProfileComp.js";
 import { useUserStore } from "./store/UserStore.js";
+import { useStopsStore } from "./store/StationStore.js";
+import { SearchPanel } from "./components/SearchPanel/SearchPanel.js";
 
 function App() {
-  const [stops, setStops] = useState<Stop[]>([]);
+  const setStops = useStopsStore(state => state.setStops)
   const {checkAuth} = useUserStore();
 
   useEffect(() => {
@@ -24,8 +25,9 @@ function App() {
   
   return (
     <div style={{position: "relative"}}>
-      <Map stops={stops} />
+      <Map />
       <UserProfileComp />
+      <SearchPanel/>
     </div>
   );
 }
