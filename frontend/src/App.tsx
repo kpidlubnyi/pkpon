@@ -1,27 +1,25 @@
 import { Map } from "./components/Map/Map.js";
-import { getStops } from "../src/services/mapService.js";
 import { useEffect } from "react";
 import { UserProfileComp } from "./components/UserProfile/UserProfileComp.js";
 import { useUserStore } from "./store/UserStore.js";
-import { useStopsStore } from "./store/StationStore.js";
 import { SearchPanel } from "./components/SearchPanel/SearchPanel.js";
+import { useStopsStore } from "./store/StopsStore.js";
 
 function App() {
-  const setStops = useStopsStore(state => state.setStops)
+  const {getStops} = useStopsStore();
   const {checkAuth} = useUserStore();
 
   useEffect(() => {
     void checkAuth();
-  }, [ checkAuth]);
+  }, [checkAuth]);
 
    useEffect(() => {
       const fetchStops = async () => {
-        const data = await getStops();
-        setStops(data.stops);
+        await getStops();
      };
      
       void fetchStops();
-    }, []);
+    }, [getStops]);
   
   return (
     <div style={{position: "relative"}}>

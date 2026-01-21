@@ -1,5 +1,5 @@
 import { Autocomplete, TextField } from "@mui/material"
-import { useStopsStore } from "../../../store/StationStore";
+import { useStopsStore } from "../../../store/StopsStore";
 import type { Stop } from "../../../types";
 import { useState } from "react";
 

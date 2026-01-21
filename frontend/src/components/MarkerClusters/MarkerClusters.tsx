@@ -7,6 +7,7 @@ import "./Tooltip.css";
 import { createClusterIcon } from "../MarkerIcons/ClusterStationMarker.tsx";
 import { useEffect, useState } from "react";
 import type { Stop } from "../../types";
+import { useStopsStore } from "../../store/StopsStore.tsx";
 
 
 type MarkerClusterProps = {
@@ -15,6 +16,7 @@ type MarkerClusterProps = {
 export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
   const map = useMap();
   const [zoomed, setZoomed] = useState(map.getZoom());
+  const { getStopInfo } = useStopsStore();
 
   //handling zoom to show/hide tooltips
   useEffect(() => {
@@ -24,6 +26,12 @@ export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
       map.off("zoomend", handleZoom);
     };
   }, [map, zoomed]);
+
+
+  const handleClick = async (id: string) => {
+    const schedules = await getStopInfo(id);
+    console.log(schedules);
+  };
 
   return (
     <MarkerClusterGroup
@@ -38,6 +46,11 @@ export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
             key={stop.stop_id}
             position={[stop.stop_lat, stop.stop_lng]}
             icon={stationMarker}
+            eventHandlers={{
+              click: () => {
+                void handleClick(stop.stop_id);
+              }
+            }}
           >
             <Tooltip
               key={zoomed}

@@ -1,4 +1,4 @@
-import { useStopsStore } from '../../store/StationStore'
+import { useStopsStore } from '../../store/StopsStore'
 import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 

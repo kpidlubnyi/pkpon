@@ -5,7 +5,7 @@ import { MarkerClusters } from "../MarkerClusters/MarkerClusters.tsx";
 import {LocateButton} from "../LocateButton/LocateButton.tsx";
 import { useState } from "react";
 import type { LatLng } from "leaflet";
-import { useStopsStore } from "../../store/StationStore.tsx";
+import { useStopsStore } from "../../store/StopsStore.tsx";
 import { MapController } from "../MapController/MapController.tsx";
 
 

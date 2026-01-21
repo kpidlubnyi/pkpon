@@ -41,3 +41,15 @@ export type GetStopsResponse = {
   stops: Stop[]
 }
 
+export type Schedule = {
+    trip_id: string,
+    arrival_time: string,
+    departure_time: string,
+    platform: number,
+    trac: number,
+    vehicle_kind: string
+}
+
+export type GetScheduleRes = {
+    schedule: Schedule[];
+}
