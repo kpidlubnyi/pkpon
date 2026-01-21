@@ -112,23 +112,23 @@ def get_stop_schedule_stop_time_ids(stop_id:str, direction:str, date_:date, time
             sts_filtered_by_stop_sq.append(st)
 
     prev_in_schedule = any(prev_st.id_ == st.id_ for st in sts_filtered_by_stop_sq)
+
     if not (prev_exists and prev_in_schedule):
         start_time = time_str
-        end_pos = 0
     else:
+        sts_filtered_by_stop_sq.pop(0)
         start_time = prev_st.time_
-        end_pos = 1
-
-
-    end_time = sts_filtered_by_stop_sq[end_pos].time_
-    end_time = normalize_time(end_time)
 
     stop_time_ids = [st.id_ for st in sts_filtered_by_stop_sq]
 
-    set_cached_stop_schedule(
-        stop_id, direction, date_str, 
-        start_time, end_time, stop_time_ids,
-    )
+    if stop_time_ids:
+        end_time = sts_filtered_by_stop_sq[0].time_
+        end_time = normalize_time(end_time)
+
+        set_cached_stop_schedule(
+            stop_id, direction, date_str, 
+            start_time, end_time, stop_time_ids,
+        )
 
     return stop_time_ids
 
