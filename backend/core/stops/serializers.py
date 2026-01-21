@@ -38,7 +38,7 @@ class BaseStopSerializer(serializers.ModelSerializer):
         )
 
 
-class BaseStopTimeSerializer(serializers.ModelSerializer):
+class StopTimeSerializer(serializers.ModelSerializer):
     stop = BaseStopSerializer()
     
     class Meta:
@@ -53,4 +53,22 @@ class BaseStopTimeSerializer(serializers.ModelSerializer):
             'track',
             'fare_dist_m',
             'vehicle_kind',
+        )
+
+class ScheduleStopTimeSerializer(StopTimeSerializer):
+    class Meta(StopTimeSerializer.Meta): 
+        fields = (
+            'trip_id',
+            'arrival_time',
+            'departure_time',
+            'platform',
+            'track',
+            'vehicle_kind',
+        )
+
+class PolylineStopTimeSerializer(StopTimeSerializer):
+    class Meta(StopTimeSerializer.Meta):
+        fields = (
+            'trip_id',
+            'stop',
         )

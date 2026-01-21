@@ -7,7 +7,7 @@ from django.conf import settings
 from core.services.redis import set_hash, truncate_gtfs_related_cached_data, get_hash
 from tasks.services.gtfs.download import FeedGTFS
 from tasks.services.gtfs.db import (
-    backup_from_common_tables, recreate_data_in_final_trips,
+    backup_from_common_tables, recreate_data_in_complete_trips,
     import_gtfs_to_staging, swap_tables
 )
 
@@ -40,8 +40,8 @@ def check_gtfs_update():
             logger.info("Swapping staging and production tables...")
             swap_tables()
 
-            logger.info("Recreating data in the FinalTrips unlogged table...")
-            recreate_data_in_final_trips()
+            logger.info("Recreating data in the CompleteTrips unlogged table...")
+            recreate_data_in_complete_trips()
 
             logger.info("Deleting GTFS related cached data...")
             deleted = truncate_gtfs_related_cached_data()

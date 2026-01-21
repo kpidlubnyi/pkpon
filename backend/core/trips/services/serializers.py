@@ -1,5 +1,4 @@
 import polyline
-from collections import defaultdict
 from functools import lru_cache
 
 from django.db.models import QuerySet
@@ -10,48 +9,31 @@ from core.services.orr import get_polyline_between_stops
 from core.services.redis import *
 
 
-@lru_cache(16)
-def get_stop_times_by_trip(ct:CompleteTrip) -> dict[str, list[StopTime]]:
-    stop_times = (
+@lru_cache(4)
+def get_complete_trip_stop_times(ct:CompleteTrip) -> QuerySet[StopTime]:
+    return (
         StopTime.objects
         .filter(trip_id__in=ct.trip_ids)
         .select_related()
         .order_by('trip_id', 'stop_sequence')
     )
+    
 
-    d = defaultdict(list)
-    for st in stop_times:
-        d[st.trip_id].append(st)
-
-    return d
-
-
-def build_trip_stop_times(ct: CompleteTrip) -> list[StopTime]:
-    l = len(ct.trip_ids)
-    stop_times_by_trip = get_stop_times_by_trip(ct)
-
-    stop_times = []
-    for i, trip_id in enumerate(ct.trip_ids):
-        trip_stop_times = stop_times_by_trip[trip_id]
-        st_l = len(trip_stop_times)
-
-        lim = st_l - 1 if i != l - 1 else st_l
-        stop_times.extend(trip_stop_times[:lim])
-
-    for i, stop_time in enumerate(stop_times):
-        stop_time.stop_sequence = i
-
-    return stop_times
+def get_ordered_complete_trip_st(trip_ids, ser_stop_times):
+    ord_st = {trip_id: [] for trip_id in trip_ids}
+    for st in ser_stop_times:
+        ord_st[st['trip_id']].append(st)
+    return ord_st
 
 
-def get_trip_polyline(stop_times: QuerySet[StopTime]) -> str:
-    def get_stop_coords_from_stop_times(stop_times: QuerySet[StopTime]) -> list[tuple[str, tuple[float, float]]]:
+def get_trip_polyline(stop_times: list[dict]) -> str:
+    def get_stop_coords_from_stop_times(stop_times: list[dict]) -> list[tuple[str, tuple[float, float]]]:
         st_coords = []
 
         for st in stop_times:
-            stop = st.stop
-            lat, lon = stop.stop_lat, stop.stop_lon
-            st_coords.append((stop.stop_id, (lat, lon)))
+            stop = st['stop']
+            lat, lon = stop['stop_lat'], stop['stop_lng']
+            st_coords.append((stop['stop_id'], (lat, lon)))
 
         return st_coords
 
@@ -62,9 +44,8 @@ def get_trip_polyline(stop_times: QuerySet[StopTime]) -> str:
             start_id, start_loc = start_stop
             end_id, end_loc = end_stop
 
-            cached_subroute = get_cached_subroute(start_id, end_id)
-            if cached_subroute:
-                p_lines.append(cached_subroute)
+            if (cached:= get_cached_subroute(start_id, end_id)):
+                p_lines.append(cached)
                 continue
 
             try:
@@ -80,47 +61,35 @@ def get_trip_polyline(stop_times: QuerySet[StopTime]) -> str:
 
     def merge_polylines(polylines: list[str]) -> str:
         coords = []
-        for i, p in enumerate(polylines):
-            if not p:
-                continue
-            try:
-                part = polyline.decode(p)
-            except Exception as e:
-                continue
-
-            if i > 0 and len(part) > 1:
-                part = part[1:]
-            coords.extend(part)
-
-        if not coords:
-            return polyline.encode([(0.0, 0.0)])
-
+        for p in polylines:
+            decoded = polyline.decode(p)
+            coords.extend(decoded)
+            
         merged = polyline.encode(coords)
         return merged
 
     st_coords = get_stop_coords_from_stop_times(stop_times)
-
-    if len(st_coords) == 1:
-        return polyline.encode([st_coords[0][1], st_coords[0][1]])
-
     polylines = get_polylines_from_coords(st_coords)
-    return merge_polylines(polylines)
+    merged_polyline = merge_polylines(polylines) 
+
+    return merged_polyline
 
 
-def get_complete_trip_polylines(trip_ids: list[str], sts_by_trip: dict[str, list[StopTime]]) -> list[str]:
+def get_complete_trip_polylines(trip_stop_times: dict[str, list[dict]]) -> list[str]:
     p_lines = []
 
-    for i, trip_id in enumerate(trip_ids, 1):
-        cached_route = get_cached_route(trip_id)
-        if cached_route:
+    for trip_id, stop_times in trip_stop_times.items():
+        if (cached_route := get_cached_route(trip_id)):
             return cached_route
 
-        trip_stop_times = sts_by_trip[trip_id]
-
-        trip_stop_times = trip_stop_times if i == len(trip_ids) else trip_stop_times[:-1]
-
-        p_line = get_trip_polyline(trip_stop_times)
+        p_line = get_trip_polyline(stop_times)
         set_cached_route(trip_id, p_line)
         p_lines.append(p_line)
 
     return p_lines
+
+
+def build_trip_route_name(stop_times: QuerySet[StopTime]) -> str:
+    first = stop_times[0].stop.stop_name
+    last = stop_times[stop_times.count() - 1].stop.stop_name
+    return f'{first} - {last}'

@@ -5,7 +5,6 @@ from django.utils import timezone as tz
 
 from tasks.models import QuerySet, Stop, StopTime 
 from trips.models import CompleteTrip
-from trips.services.serializers import build_trip_stop_times
 from core.services.redis import (
     get_cached_stop_real_stop_times,
     get_cached_stop_schedule,
@@ -98,8 +97,6 @@ def get_stop_schedule_stop_time_ids(stop_id:str, direction:str, date_:date, time
                 if st[needed_time] > prev_st.time_:
                     prev_st = ScheduleStopTimeNT(st['id'], st['trip_id'], st[needed_time])
     
-    
-    
     if (prev_exists := bool(prev_st.id_)):
         sts_filtered_by_datetime.insert(0, prev_st)
 
@@ -107,10 +104,11 @@ def get_stop_schedule_stop_time_ids(stop_id:str, direction:str, date_:date, time
     pos = 0 if direction == 'arrivals' else -1
     
     for st in sts_filtered_by_datetime:
-        complete_trip = CompleteTrip.objects.get(trip_ids__contains=[st.trip_id])
-        ct_stop_times = build_trip_stop_times(complete_trip)
+        ct_stops = CompleteTrip.objects \
+            .get(trip_ids__contains=[st.trip_id]) \
+            .stops
         
-        if ct_stop_times[pos].stop.stop_id != stop_id:
+        if ct_stops[pos] != stop_id:
             sts_filtered_by_stop_sq.append(st)
 
     prev_in_schedule = any(prev_st.id_ == st.id_ for st in sts_filtered_by_stop_sq)
