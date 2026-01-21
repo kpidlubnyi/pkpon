@@ -97,8 +97,6 @@ def get_stop_schedule_stop_time_ids(stop_id:str, direction:str, date_:date, time
                 if st[needed_time] > prev_st.time_:
                     prev_st = ScheduleStopTimeNT(st['id'], st['trip_id'], st[needed_time])
     
-    
-    
     if (prev_exists := bool(prev_st.id_)):
         sts_filtered_by_datetime.insert(0, prev_st)
 

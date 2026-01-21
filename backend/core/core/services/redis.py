@@ -127,17 +127,17 @@ def set_cached_route(trip_id:str, value:str) -> int:
 def set_cached_stop_real_stop_times(stop_id:str, data:list[dict]) -> int:
     return set_cached('real_stop_times', stop_id, data, is_json=True)
 
+def calculate_time_range(from_t: str, to_t: str) -> int:
+    fmt = "%H:%M:%S"
+    start = datetime.strptime(from_t, fmt)
+    end = datetime.strptime(to_t, fmt)
+    delta = (end - start).total_seconds()
+    return max(0, int(delta))
+
 def set_cached_stop_schedule(
     stop_id: str, direction: str, date_: str, 
     from_time: str, to_time: str, data:list[dict],
 ) -> int:
-    def calculate_time_range(from_t: str, to_t: str) -> int:
-        fmt = "%H:%M:%S"
-        start = datetime.strptime(from_t, fmt)
-        end = datetime.strptime(to_t, fmt)
-        delta = (end - start).total_seconds()
-        return max(0, int(delta))
-
     key = f'{stop_id}:{direction}:{date_}:{from_time}-{to_time}'
     ex = calculate_time_range(from_time, to_time)
 
@@ -151,6 +151,24 @@ def set_cached_stop_schedule(
             break
         
     return set_cached('schedule', key, data, is_json=True, ex=ex)
+
+def set_cached_user_trip_ids_search(
+    from_stop:str, to_stop:str, date:str, 
+    from_time:str, to_time:str, data: list[str]
+) -> int:
+    key = f'{from_stop}-{to_stop}:{date}:{from_time}-{to_time}'
+    ex = calculate_time_range(from_time, to_time)
+
+    pattern = f'user_trip:{from_stop}-{to_stop}:{date}:*'
+    for k in redis_client.scan_iter(match=pattern):
+        *_, tr = k.split(':', maxsplit=3)
+        k_to_time = tr.split('-')[1]
+
+        if to_time == k_to_time:
+            redis_client.delete(k)
+            break
+
+    return set_cached('user_trip', key, data, is_json=True, ex=ex)
 
 
 @redis_operation
@@ -178,16 +196,26 @@ def get_cached_stop_real_stop_times(stop_id:str) -> list[dict[str, Any]] | None:
 def get_cached_stop_schedule(stop_id: str, direction: str, date_: str, time_: str) -> list[dict] | None:
     pattern = f'schedule:{stop_id}:{direction}:{date_}:*'
 
-    for key in  redis_client.scan_iter(match=pattern):
-        _, k_s, k_dr, k_dt, k_tr = key.split(':', maxsplit=4)
+    for key in redis_client.scan_iter(match=pattern):
+        prfx, k_s, k_dr, k_dt, k_tr = key.split(':', maxsplit=4)
         key_ft, key_tt = k_tr.split('-', 1)
 
         if key_ft <= time_ <= key_tt:
             cache_key = f'{k_s}:{k_dr}:{k_dt}:{k_tr}'
-            return get_cached('schedule', cache_key, is_json=True)
+            return get_cached(prfx, cache_key, is_json=True)
 
     return None
 
+def get_cached_user_trip_ids_search(from_stop_id:str, to_stop_id:str, date_:str, time_:str) -> list[str] | None:
+    pattern = f'user_trip:{from_stop_id}-{to_stop_id}:{date_}:*'
+
+    for key in redis_client.scan_iter(match=pattern):
+        prfx, fr_to_s, d, tr = key.split(':', maxsplit=3)
+        fr_t, to_t = tr.split('-', maxsplit=1)
+
+        if fr_t <= time_ <= to_t:
+            cache_key = f'{fr_to_s}:{d}:{tr}'
+            return get_cached(prfx, cache_key, is_json=True)
 
 
 @redis_operation
@@ -223,12 +251,15 @@ def truncate_cached_stop_real_stop_times() -> int:
 def truncate_cached_schedules() -> int:
     return truncate_cached('schedule:*')
 
+def truncate_cached_user_trips() -> int:
+    return truncate_cached('user_trip:*')
 
 def truncate_gtfs_related_cached_data() -> int:
     return truncate_cached_trips() \
         + truncate_cached_routes() \
         + truncate_cached_stop_real_stop_times() \
-        + truncate_cached_schedules()
+        + truncate_cached_schedules() \
+        + truncate_cached_user_trips()
 
 def truncate_map_related_cached_data() -> int:
     return truncate_cached_routes()

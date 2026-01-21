@@ -32,6 +32,7 @@ class UserTripsView(APIView):
         to_stop = q_params['to_stop']
 
         matching_trips = find_matching_trips(from_stop, to_stop, date, time)
+        
         serialized = UserTripSearchCompleteTripSerializer(
             matching_trips, 
             context= {
@@ -40,6 +41,6 @@ class UserTripsView(APIView):
             },
             many=True
         ).data
+        
         serialized.sort(key=lambda x: x['departure_stop_time']['departure_time'])
-
         return JsonResponse({'matching_trips': serialized}, status=status.HTTP_200_OK)
