@@ -76,17 +76,30 @@ def backup_from_common_tables():
                             cursor.execute(f"SELECT setval('{sequence_name_staging}', {max_id+1});")
 
 
-def recreate_data_in_final_trips():
+def recreate_data_in_complete_trips():
+    def build_complete_trip_stops(trip_ids: list[str]) -> list[str]:
+        complete_trip_stops = []
+        
+        for trip_id in trip_ids:
+            stops = StopTime.objects \
+                .filter(trip_id=trip_id) \
+                .order_by('stop_sequence') \
+                .values_list('stop__stop_id', flat=True)
+            complete_trip_stops.extend(stops)
+        
+        return complete_trip_stops
+
+
     CompleteTrip.objects.all().delete()
 
     processed_trip_ids = set()
-    final_trips = []
+    grouped_trip_ids = []
 
     for start_trip in Trip.objects.all().order_by("trip_id"):
         if start_trip.trip_id in processed_trip_ids:
             continue
 
-        envolved_trip_ids = []
+        involved_trip_ids = []
         current_trip = start_trip
 
         while True:
@@ -94,7 +107,7 @@ def recreate_data_in_final_trips():
                 break
 
             processed_trip_ids.add(current_trip.trip_id)
-            envolved_trip_ids.append(current_trip.trip_id)
+            involved_trip_ids.append(current_trip.trip_id)
 
             transfer = (
                 Transfer.objects
@@ -108,8 +121,12 @@ def recreate_data_in_final_trips():
 
             current_trip = transfer.to_trip
 
-        final_trips.append(
-            CompleteTrip(trip_ids=envolved_trip_ids)
+        complete_trip_stops = build_complete_trip_stops(involved_trip_ids)
+        grouped_trip_ids.append(
+            CompleteTrip(
+                trip_ids=involved_trip_ids,
+                stops=complete_trip_stops,
+            )
         )
 
-    CompleteTrip.objects.bulk_create(final_trips)
+    CompleteTrip.objects.bulk_create(grouped_trip_ids)

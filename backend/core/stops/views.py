@@ -23,6 +23,6 @@ class StopScheduleView(APIView):
         direction = q_params['direction']
 
         schedule = get_stop_schedule(stop_id, direction, date, time)
-        serialized = BaseStopTimeSerializer(schedule, many=True).data
+        serialized = ScheduleStopTimeSerializer(schedule, many=True).data
         
         return JsonResponse({'schedule': serialized}, status=status.HTTP_200_OK)
