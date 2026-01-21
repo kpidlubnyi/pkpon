@@ -56,9 +56,11 @@ class StopTimeSerializer(serializers.ModelSerializer):
         )
 
 class ScheduleStopTimeSerializer(StopTimeSerializer):
+    trip_headsign = serializers.CharField(source='trip.trip_headsign', read_only=True)
+
     class Meta(StopTimeSerializer.Meta): 
         fields = (
-            'trip_id',
+            'trip_headsign',
             'arrival_time',
             'departure_time',
             'platform',
