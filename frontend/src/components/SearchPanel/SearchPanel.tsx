@@ -13,7 +13,7 @@ export const SearchPanel = () => {
             <div className={css['logo-cont']}>
                 <LogoIcon className={css["logo"]} width={28} height={28} />
             </div>
-            <Search/>
+            
             <div className={css["toggle-cont"]}>
                 <div className={css['auth-toggle-container']}>
                     <div className={css['toggle-wrapper']}>
@@ -40,6 +40,7 @@ export const SearchPanel = () => {
                     </div>
                 </div>
             </div>
+            <Search/>
         </div>
     );
 }

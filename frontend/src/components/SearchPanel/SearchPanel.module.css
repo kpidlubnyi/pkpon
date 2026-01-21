@@ -5,8 +5,9 @@
     z-index: 999;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    gap: 18px;
     min-width: 600px;
     height: 64px;
     padding: 12px;
@@ -24,7 +25,6 @@
     height: 50px;
     background-color: var(--primary-blue);
     border-radius: 50%;
-    margin-right: 18px;
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -39,7 +39,6 @@
 
 .toggle-cont {
     width: 144px;
-    margin-left: 80px;
 }
 
 .toggle-wrapper {

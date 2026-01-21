@@ -6,7 +6,7 @@ import { stationMarker } from "../MarkerIcons/MarkerIcons.ts";
 import "./Tooltip.css";
 import { createClusterIcon } from "../MarkerIcons/ClusterStationMarker.tsx";
 import { useEffect, useState } from "react";
-import type { Stop } from "../../types/mapTypes.ts";
+import type { Stop } from "../../types";
 
 
 type MarkerClusterProps = {
