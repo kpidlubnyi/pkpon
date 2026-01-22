@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('trips', '0003_rename_finaltrip_completetrip_and_more'),
+        ('trips', '0002_rename_finaltrip_completetrip_and_more'),
     ]
 
     operations = [
