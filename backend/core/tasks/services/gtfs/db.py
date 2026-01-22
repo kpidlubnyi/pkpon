@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.db import transaction, connection
 
 from trips.models import CompleteTrip
@@ -77,56 +79,53 @@ def backup_from_common_tables():
 
 
 def recreate_data_in_complete_trips():
-    def build_complete_trip_stops(trip_ids: list[str]) -> list[str]:
-        complete_trip_stops = []
-        
-        for trip_id in trip_ids:
-            stops = StopTime.objects \
-                .filter(trip_id=trip_id) \
-                .order_by('stop_sequence') \
-                .values_list('stop__stop_id', flat=True)
-            complete_trip_stops.extend(stops)
-        
-        return complete_trip_stops
-
-
     CompleteTrip.objects.all().delete()
 
-    processed_trip_ids = set()
+    transfers = {
+        tr.from_trip_id: tr.to_trip_id
+        for tr in Transfer.objects.all()
+    }
+
+    trip_ids = list(
+        Trip.objects.all()
+        .order_by('trip_id')
+        .values_list('trip_id', flat=True)
+    )
+
+    stop_times = ( 
+        StopTime.objects.all() 
+        .order_by('trip', 'stop_sequence')
+        .values_list('trip__trip_id', 'stop__stop_id')
+    )
+
+    stops_by_trip = defaultdict(list)
+    for trip_id, stop_id in stop_times:
+        stops_by_trip[trip_id].append(stop_id)
+
+    processed = set()
     grouped_trip_ids = []
 
-    for start_trip in Trip.objects.all().order_by("trip_id"):
-        if start_trip.trip_id in processed_trip_ids:
+    for start_trip_id in trip_ids:
+        if start_trip_id in processed:
             continue
 
-        involved_trip_ids = []
-        current_trip = start_trip
+        involved = []
+        current = start_trip_id
 
-        while True:
-            if current_trip.trip_id in processed_trip_ids:
-                break
+        while current and current not in processed:
+            processed.add(current)
+            involved.append(current)
+            current = transfers.get(current)
 
-            processed_trip_ids.add(current_trip.trip_id)
-            involved_trip_ids.append(current_trip.trip_id)
+        complete_stops = []
+        for trip_id in involved:
+            complete_stops.extend(stops_by_trip.get(trip_id, []))
 
-            transfer = (
-                Transfer.objects
-                .filter(from_trip=current_trip)
-                .select_related("to_trip")
-                .first()
-            )
-
-            if not transfer:
-                break
-
-            current_trip = transfer.to_trip
-
-        complete_trip_stops = build_complete_trip_stops(involved_trip_ids)
         grouped_trip_ids.append(
             CompleteTrip(
-                trip_ids=involved_trip_ids,
-                stops=complete_trip_stops,
+                trip_ids=involved,
+                stops=complete_stops,
             )
         )
-
+    
     CompleteTrip.objects.bulk_create(grouped_trip_ids)
