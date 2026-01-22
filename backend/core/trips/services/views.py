@@ -81,13 +81,19 @@ def find_matching_trips(from_stop:str, to_stop:str, date_:date, time_:time) -> d
                         else max(last_not_matching_time, dep_time)
                     )
 
-    mt_ids = [tr.id for tr in matching_trips]
-    from_time_str = last_not_matching_time
-    to_time_str = first_matching_time
-    
-    set_cached_user_trip_ids_search(
-        from_stop, to_stop, date_str, 
-        from_time_str, to_time_str, mt_ids
-    )
+    if matching_trips:
+        if last_not_matching_time:
+            from_time_str = last_not_matching_time
+        else:
+            from_time_str = time_str
+
+        to_time_str = first_matching_time
+
+        mt_ids = [tr.id for tr in matching_trips]
+
+        set_cached_user_trip_ids_search(
+            from_stop, to_stop, date_str, 
+            from_time_str, to_time_str, mt_ids
+        )
 
     return matching_trips
