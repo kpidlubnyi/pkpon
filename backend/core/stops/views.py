@@ -26,3 +26,14 @@ class StopScheduleView(APIView):
         serialized = ScheduleStopTimeSerializer(schedule, many=True).data
         
         return JsonResponse({'schedule': serialized}, status=status.HTTP_200_OK)
+
+
+class StopIsochroneView(APIView):
+    def get(self, request, stop_id):
+        srl = StopIsochroneSerializer(data=request.query_params)
+        srl.is_valid(raise_exception=True)
+
+        hours = srl.validated_data['hours']
+        isochrone_map = get_isochrone_map(stop_id, hours)
+
+        return JsonResponse(isochrone_map, status=status.HTTP_200_OK)

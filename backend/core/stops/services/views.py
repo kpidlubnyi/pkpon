@@ -1,16 +1,20 @@
 from datetime import date, time 
 from typing import NamedTuple
+from math import sqrt
+from shapely import Point, Polygon
 
 from django.utils import timezone as tz
 
 from tasks.models import QuerySet, Stop, StopTime 
 from trips.models import CompleteTrip
+from core.services.orr import get_isochrone_polygone
 from core.services.redis import (
     get_cached_stop_real_stop_times,
     get_cached_stop_schedule,
     set_cached_stop_real_stop_times,
     set_cached_stop_schedule,
 )
+
 
 
 def get_all_stops():
@@ -142,3 +146,80 @@ def get_stop_schedule(stop_id:str, direction:str, date_:date, time_:time) -> Que
         .order_by(needed_time)
 
     return schedule
+
+
+
+
+
+def simplify_polygon(points: list[list[float]]) -> list[list[float]]:
+    def rdp(points, eps):
+        def get_perp_dist(point, start, end):
+            if start == end:
+                return sqrt((point[0] - start[0])**2 + (point[1] - start[1])**2)
+            else:
+                x0, y0 = point
+                x1, y1 = start
+                x2, y2 = end
+                num = abs((y2 - y1)*x0 - (x2 - x1)*y0 + x2*y1 - y2*x1)
+                den = sqrt((y2 - y1)**2 + (x2 - x1)**2)
+                return num / den
+    
+        if len(points) < 3:
+            return points
+            
+        max_dist = 0.0
+        index = 0
+        for i in range(1, len(points) - 1):
+            dist = get_perp_dist(points[i], points[0], points[-1])
+            if dist > max_dist:
+                max_dist = dist
+                index = i
+
+        if max_dist > eps:
+            left = rdp(points[:index+1], eps)
+            right = rdp(points[index:], eps)
+            return left[:-1] + right
+        else:
+            return [points[0], points[-1]]
+
+    xs, ys = zip(*points)
+    max_dist = max(max(xs) - min(xs), max(ys) - min(ys))
+    epsilon = max_dist / 100
+
+    return rdp(points, epsilon)
+
+
+def get_isochrone_map(stop_id: str, hours: int):
+    stops_qs = list(
+        Stop.objects
+        .values('stop_id', 'stop_lat', 'stop_lon')
+    )
+
+    stop = next(s for s in stops_qs if s['stop_id'] == stop_id)
+    stop_loc = (stop['stop_lat'], stop['stop_lon'])
+
+    layers = dict()
+    already_in = set()
+
+    stop_points = {
+        s['stop_id']: Point(s['stop_lon'], s['stop_lat'])
+        for s in stops_qs
+    }
+
+    for i in range(1, hours + 1):
+        area = get_isochrone_polygone(stop_loc, i)
+        area = simplify_polygon(area)
+
+        polygon = Polygon(area)
+
+        stops_in_area = {
+            stop_id
+            for stop_id, point in stop_points.items()
+            if polygon.covers(point)
+        }
+
+        new_ones = stops_in_area - already_in
+        layers[hours - i] = list(new_ones)
+        already_in.update(new_ones)
+
+    return layers

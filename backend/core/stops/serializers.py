@@ -25,6 +25,10 @@ class StopScheduleSerializer(serializers.Serializer):
         return attrs
 
 
+class StopIsochroneSerializer(serializers.Serializer):
+    hours = serializers.IntegerField(min_value = 1, max_value = 8, default=4)
+
+    
 class BaseStopSerializer(serializers.ModelSerializer):
     stop_lng = serializers.FloatField(source='stop_lon')
 
@@ -60,6 +64,7 @@ class ScheduleStopTimeSerializer(StopTimeSerializer):
 
     class Meta(StopTimeSerializer.Meta): 
         fields = (
+            'trip_id',
             'trip_headsign',
             'arrival_time',
             'departure_time',
