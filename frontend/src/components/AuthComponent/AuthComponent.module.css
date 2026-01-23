@@ -16,16 +16,3 @@
 .form-cont {
     width: 100%;
 }
-
-.active {
-    opacity: 1;
-    transform: translateX(0%);
-    z-index: 2;
-}
-
-.hidden {
-    opacity: 0;
-    transform: translateX(50%);
-    z-index: 1;
-    pointer-events: none;
-}

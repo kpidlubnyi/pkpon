@@ -8,10 +8,10 @@ export const stopApi = {
         return res.data
     },
 
-    getStopInfo: async (stopId: string): Promise<GetScheduleRes> => {
+    getStopInfo: async (stopId: string, options?: {direction?: 'arrivals' | 'departures'}): Promise<GetScheduleRes> => {
         const res = await api.get<GetScheduleRes>(`/stops/${stopId}/schedule`, {
             params: {
-                direction: "departures",
+                direction: options?.direction || "departures",
                 date: new Date().toISOString().split('T')[0],
                 time: new Date().toLocaleTimeString()
             }

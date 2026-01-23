@@ -29,8 +29,11 @@ export const MarkerClusters = ({ stops }: MarkerClusterProps) => {
 
 
   const handleClick = async (id: string) => {
-    const schedules = await getStopInfo(id);
-    console.log(schedules);
+    try {
+      await getStopInfo(id); 
+    } catch (error) {
+      console.error("Error with geting info", error);
+    }
   };
 
   return (

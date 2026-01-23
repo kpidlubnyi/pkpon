@@ -13,34 +13,32 @@ export const SearchPanel = () => {
             <div className={css['logo-cont']}>
                 <LogoIcon className={css["logo"]} width={28} height={28} />
             </div>
-            
             <div className={css["toggle-cont"]}>
-                <div className={css['auth-toggle-container']}>
-                    <div className={css['toggle-wrapper']}>
-                        <div
-                            className={css['toggle-highlight']}
-                            style={{
-                                transform: active === 'left'
-                                    ? 'translateX(0%)'
-                                    : 'translateX(100%)',
-                            }}
-                        />
-                        <button
-                            className={css['toggle-btn']}
-                            onClick={() => setActive('left')}
-                        >
-                            <TrainIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "left" ? css["active"] : ''}`} />
-                        </button>
-                        <button
-                            className={css['toggle-btn']}
-                            onClick={() => setActive('right')}
-                        >
-                            <StopIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "right" ? css["active"] : ''}`} />
-                        </button>
-                    </div>
+                <div className={css['toggle-wrapper']}>
+                    <div
+                        className={css['toggle-highlight']}
+                        style={{
+                            transform: active === 'left'
+                                ? 'translateX(0%)'
+                                : 'translateX(100%)',
+                        }}
+                    />
+                    <button
+                        className={css['toggle-btn']}
+                        onClick={() => setActive('left')}
+                    >
+                        <TrainIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "left" ? css["active"] : ''}`} />
+                    </button>
+                    <button
+                        className={css['toggle-btn']}
+                        onClick={() => setActive('right')}
+                    >
+                        <StopIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "right" ? css["active"] : ''}`} />
+                    </button>
                 </div>
             </div>
-            <Search/>
+
+            <Search />
         </div>
     );
 }

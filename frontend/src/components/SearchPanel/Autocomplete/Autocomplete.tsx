@@ -7,6 +7,16 @@ export const Search = () => {
     const { stops, selectStopById } = useStopsStore();
     const [inputValue, setInputValue] = useState('');
     const [value, setValue] = useState<Stop | null>(null);
+    const { getStopInfo } = useStopsStore();
+
+    const handleOnChange = async (id: string) => {
+        try {
+            await getStopInfo(id);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <Autocomplete<Stop>
@@ -31,6 +41,7 @@ export const Search = () => {
                 setValue(newValue)
                 if (newValue) {
                     selectStopById(newValue.stop_id)
+                    void handleOnChange(newValue.stop_id)
                 }
             }}
             sx={{

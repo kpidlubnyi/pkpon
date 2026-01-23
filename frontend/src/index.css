@@ -15,6 +15,12 @@ body {
   padding: 0;
 }
 
+ol, ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 h1, h2, h3, h4, h5, h6, p {
   margin: 0;
   padding: 0;
@@ -22,7 +28,7 @@ h1, h2, h3, h4, h5, h6, p {
 
 :root {
   /* colors */
-  --primary-blue: #3A62FF;
+  --primary-blue: rgb(58, 98, 255);
   --primary-hover: #0746d9;
 
   --gray: #808080;
@@ -44,10 +50,11 @@ h1, h2, h3, h4, h5, h6, p {
 
   --winter-gradient: linear-gradient(to right, #8db1cc, #e2e9ea);
   --shadow: 0 10px 4px -1px rgba(0, 0, 0, 0.25);
-
+  --sm-shadow: 0 6px 4px -1px rgba(0, 0, 0, 0.25);
   --title: 24px;
   --subtitle: 16px;
   --body: 14px;
+  --background: #eeeeeea7
 }
 
 

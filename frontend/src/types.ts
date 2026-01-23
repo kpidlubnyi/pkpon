@@ -42,11 +42,12 @@ export type GetStopsResponse = {
 }
 
 export type Schedule = {
+    trip_headsign: string
     trip_id: string,
     arrival_time: string,
     departure_time: string,
     platform: number,
-    trac: number,
+    track: number,
     vehicle_kind: string
 }
 
