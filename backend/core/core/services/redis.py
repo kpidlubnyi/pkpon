@@ -142,6 +142,10 @@ def set_cached_route(trip_id:str, value:str) -> int:
 def set_cached_stop_real_stop_times(stop_id:str, data:list[dict]) -> int:
     return set_cached('real_stop_times', stop_id, data, is_json=True)
 
+def set_cached_stop_isochrone(stop_id:str, hours:int, data:list[str]):
+    key = f'{stop_id}:{hours}'
+    return set_cached('isochrone', key, data, is_json=True)
+
 def calculate_time_range(from_t: str, to_t: str) -> int:
     fmt = "%H:%M:%S"
     start = datetime.strptime(from_t, fmt)
@@ -213,6 +217,10 @@ def get_cached_route(trip_id:str) -> str | None:
 def get_cached_stop_real_stop_times(stop_id:str) -> list[dict[str, Any]] | None:
     return get_cached('real_stop_times', stop_id, is_json=True)
 
+def get_cached_stop_isochrone(stop_id:str, hours:int) -> list[str] | None:
+    key = f'{stop_id}:{hours}'
+    return get_cached('isochrone', key, is_json=True)
+
 def get_cached_stop_schedule(stop_id: str, direction: str, date_: str, time_: str) -> list[dict] | None:
     pattern = f'schedule:{stop_id}:{direction}:{date_}:*'
 
@@ -267,12 +275,16 @@ def truncate_cached_schedules() -> int:
 def truncate_cached_user_trips() -> int:
     return truncate_cached('user_trip:*')
 
+def truncate_cached_stop_isochrones() -> int:
+    return truncate_cached('isochrone:*')
+
 def truncate_gtfs_related_cached_data() -> int:
     return truncate_cached_trips() \
         + truncate_cached_routes() \
         + truncate_cached_stop_real_stop_times() \
         + truncate_cached_schedules() \
-        + truncate_cached_user_trips()
+        + truncate_cached_user_trips() \
+        + truncate_cached_stop_isochrones()
 
 def truncate_map_related_cached_data() -> int:
     return truncate_cached_routes()

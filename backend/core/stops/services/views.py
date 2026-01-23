@@ -11,8 +11,10 @@ from core.services.orr import get_isochrone_polygone
 from core.services.redis import (
     get_cached_stop_real_stop_times,
     get_cached_stop_schedule,
+    get_cached_stop_isochrone,
     set_cached_stop_real_stop_times,
     set_cached_stop_schedule,
+    set_cached_stop_isochrone,
 )
 
 
@@ -189,7 +191,19 @@ def simplify_polygon(points: list[list[float]]) -> list[list[float]]:
     return rdp(points, epsilon)
 
 
-def get_isochrone_map(stop_id: str, hours: int):
+def get_isochrone_map(stop_id:str, hours:int):
+    def calculate_area(stop_loc:tuple, hour:int) -> Polygon:
+        area = get_isochrone_polygone(stop_loc, hour)
+        area = simplify_polygon(area)
+        return Polygon(area)
+
+    def filter_stop_ids_by_area(stop_points: list[Point], area: Polygon) -> set[str]:
+        return {
+            s_id
+            for s_id, point in stop_points.items()
+            if area.covers(point)
+        }
+
     stops_qs = list(
         Stop.objects
         .values('stop_id', 'stop_lat', 'stop_lon')
@@ -207,19 +221,18 @@ def get_isochrone_map(stop_id: str, hours: int):
     }
 
     for i in range(1, hours + 1):
-        area = get_isochrone_polygone(stop_loc, i)
-        area = simplify_polygon(area)
-
-        polygon = Polygon(area)
-
-        stops_in_area = {
-            stop_id
-            for stop_id, point in stop_points.items()
-            if polygon.covers(point)
-        }
-
-        new_ones = stops_in_area - already_in
-        layers[hours - i] = list(new_ones)
-        already_in.update(new_ones)
+        if (cached := get_cached_stop_isochrone(stop_id, i)):
+            new_ones = cached
+            new_ones_set = set(new_ones)
+        else:
+            area = calculate_area(stop_loc, i)
+            stops_in_area = filter_stop_ids_by_area(stop_points, area)
+            
+            new_ones_set = stops_in_area - already_in
+            new_ones = list(new_ones_set)
+            set_cached_stop_isochrone(stop_id, i, new_ones)
+        
+        layers[hours - i] = new_ones
+        already_in.update(new_ones_set)
 
     return layers

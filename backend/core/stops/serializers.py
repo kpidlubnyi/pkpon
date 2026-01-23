@@ -26,7 +26,7 @@ class StopScheduleSerializer(serializers.Serializer):
 
 
 class StopIsochroneSerializer(serializers.Serializer):
-    hours = serializers.IntegerField(min_value = 1, max_value = 8, default=4)
+    hours = serializers.IntegerField(min_value = 1, max_value = 6, default=4)
 
     
 class BaseStopSerializer(serializers.ModelSerializer):
