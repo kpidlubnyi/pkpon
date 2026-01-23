@@ -5,5 +5,5 @@ from .views import *
 
 urlpatterns = [
     path('', AllStopsView.as_view()),
-    path('<int:stop_id>/schedule', StopScheduleView.as_view(), name='stop_schedule'),
+    path('<str:stop_id>/schedule', StopScheduleView.as_view(), name='stop_schedule'),
 ]
