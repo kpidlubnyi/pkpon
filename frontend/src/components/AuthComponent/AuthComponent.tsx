@@ -11,18 +11,7 @@ export const AuthComponent = () => {
     <div className={css['auth-container']}>
       <ToggleComponent active={active} setActive={setActive} />
       <div className={css['form-cont']}>
-          {active === 'login' ? <div
-              className={`${ active === 'login' ? css['active'] : css['hidden']
-              }`}
-            >
-              <LoginComponent />
-            </div>
-              : <div
-              className={`${ active === 'register' ? css['active'] : css['hidden']
-              }`}
-            >
-              <RegisterComponent />
-            </div>}
+          {active === 'login' ? <LoginComponent /> : <RegisterComponent />}
       </div>
     </div>
   );
