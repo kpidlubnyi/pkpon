@@ -50,11 +50,29 @@
     border: none;
     cursor: pointer;
 }
+
 .logout {
     margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+    border-radius: 50%;
+    transition: background 0.4s ease-in-out ;
+}
+
+.logout:hover {
+    background-color: var(--primary-blue);
 }
 
 .logout-icon {
-    fill: var(--primary-blue);
-    stroke: white;
+    color: var(--primary-blue);
+    transition: color 0.4s ease-in-out;
+}
+
+.logout-btn:hover .logout-icon * {
+    color: #fff;
 }
