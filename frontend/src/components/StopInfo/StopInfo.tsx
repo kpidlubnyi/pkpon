@@ -7,6 +7,7 @@ import IsoChrone from '../../assets/icons/isochrone.svg?react';
 import { useRef, useState } from "react";
 import { DatePickerComponent, type DatePickerRef } from "../DatePicker/DatePicker";
 import { parseDateTimeString } from "../../utils/DateTimeParser";
+import { Loading } from "../Loading/Loading";
 
 export const StopInfo = () => {
     const datePickerRef = useRef<DatePickerRef>(null);
@@ -92,6 +93,7 @@ export const StopInfo = () => {
                     </div>
                 </div>
                 <div className={css['scroll-cont']}>
+                    <Loading source="stops"/>
                     {selectedStopSchedule && selectedStopSchedule?.schedule.length < 1 ? (
                         <h2 className={css['no-train']}>
                             W tym momencie nie ma żadnych pociągów, spróbuj zmienić datę albo czas

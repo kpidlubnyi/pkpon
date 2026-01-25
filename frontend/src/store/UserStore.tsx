@@ -5,22 +5,19 @@ import type {
   RegisterData,
   LoginData,
 } from '../types.ts';
-import axios from 'axios';
+import toast from 'react-hot-toast';
+import { handleApiError } from '../utils/HandleApiError.ts';
 
 interface AuthResult {
   success: boolean;
   error?: string;
 }
 
-interface DRFValidationError {
-  [key: string]: string[] | string | undefined; 
-  non_field_errors?: string[];
-}
-
 interface AuthState {
   user: User | null;
-  loading: boolean;
   showAuthModal: boolean;
+  isUserLoading: boolean;
+  error: string | null;
 
   checkAuth: () => Promise<void>;
   login: (data: LoginData) => Promise<AuthResult>;
@@ -32,16 +29,14 @@ interface AuthState {
 
 export const useUserStore = create<AuthState>((set, get) => ({
   user: null,
-  loading: true,
   showAuthModal: false,
+  isUserLoading: false,
+  error: null,
 
   checkAuth: async () => {
     const sessionId = localStorage.getItem('session_id');
 
-    if (!sessionId) {
-      set({ loading: false });
-      return;
-    }
+    if (!sessionId) return;
 
     try {
       const res = await authAPI.getProfile();
@@ -51,46 +46,35 @@ export const useUserStore = create<AuthState>((set, get) => ({
       localStorage.removeItem('session_id');
       set({ user: null });
     } finally {
-      set({ loading: false });
+      set({ isUserLoading: false });
     }
   },
 
   login: async (data) => {
+    set({isUserLoading: true})
     try {
       const res = await authAPI.login(data);
       localStorage.setItem('session_id', res.session_id);
 
       const profile = await authAPI.getProfile();
       set({
+        isUserLoading: false,
         user: profile.data.user,
         showAuthModal: false,
       });
 
+      toast.success('Zalogowano pomyślnie')
       return { success: true };
+
     } catch (error: unknown) {
-  if (axios.isAxiosError(error) && error.response?.data) {
-    const data = error.response.data as DRFValidationError;
-
-    const fieldErrors = Object.entries(data)
-      .filter(([, value]) => Array.isArray(value))
-      .map(([key, value]) => `${key}: ${(value as string[]).join(', ')}`);
-
-    const generalError = typeof data.error === 'string' ? data.error : 
-                           Array.isArray(data.error) ? data.error.join(', ') : 
-                           Array.isArray(data.non_field_errors) ? data.non_field_errors.join(', ') : '';
-
-    const message = fieldErrors.length > 0
-      ? fieldErrors.join(' | ')
-      : generalError || 'Błąd rejestracji';
-
-    return { success: false, error: message };
-  }
-
-  return { success: false, error: 'Błąd rejestracji' };
-  };
+      set({ isUserLoading: false });
+    const errorMessage = handleApiError(error, 'Błąd logowania');
+    return { success: false, error: errorMessage };
+    }
   },
 
-register: async (data) => {
+  register: async (data) => {
+    set({ isUserLoading: true });
   try {
     const res = await authAPI.register(data);
     localStorage.setItem('session_id', res.session_id);
@@ -99,41 +83,30 @@ register: async (data) => {
     set({
       user: profile.data.user,
       showAuthModal: false,
+      isUserLoading: false,
     });
-
+    toast.success('Zarejestrowano pomyślnie');
     return { success: true };
+
   } catch (error: unknown) {
-  if (axios.isAxiosError(error) && error.response?.data) {
-    const data = error.response.data as DRFValidationError;
-
-    const fieldErrors = Object.entries(data)
-      .filter(([, value]) => Array.isArray(value))
-      .map(([key, value]) => `${key}: ${(value as string[]).join(', ')}`);
-
-    const generalError = typeof data.error === 'string' ? data.error : 
-                           Array.isArray(data.error) ? data.error.join(', ') : 
-                           Array.isArray(data.non_field_errors) ? data.non_field_errors.join(', ') : '';
-
-    const message = fieldErrors.length > 0
-      ? fieldErrors.join(' | ')
-      : generalError || 'Błąd rejestracji';
-
-    return { success: false, error: message };
-  }
-
-  return { success: false, error: 'Błąd rejestracji' };
-  };
+    set({ isUserLoading: false });
+    const errorMessage = handleApiError(error, "Błąd rejestracji");
+    return { success: false, error: errorMessage };
+    };
 },
 
 
   logout: async () => {
+    set({ isUserLoading: true });
     try {
       await authAPI.logout();
+      localStorage.removeItem('session_id');
+      set({ user: null, isUserLoading: false });
+      toast.success('Wylogowano');
     } catch (error) {
       console.error('Logout error', error);
-    } finally {
-      localStorage.removeItem('session_id');
-      set({ user: null });
+      set({ user: null, isUserLoading: false });
+      toast.error('Coś poszło nie tak, spróbuj ponownie')
     }
   },
 
