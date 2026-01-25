@@ -31,13 +31,19 @@ export const DatePickerComponent = forwardRef<DatePickerRef, DatePickerProps>(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DateTimePicker
           value={value}
-          onChange={handleDateTimeChange}
+          onChange={(newValue) => setValue(newValue)}
           ampm={false}
           format={value ? 'DD.MM HH:mm' : 'Wybierz datę i czas'}
-          minDateTime={dayjs()} // Блокуємо минулі дати та час
+          minDateTime={dayjs()} 
           open={open}
           onOpen={() => setOpen(true)}
           onClose={() => setOpen(false)}
+          onAccept={(newValue) => handleDateTimeChange(newValue)}
+          slotProps={{
+            actionBar: {
+                actions:['cancel', 'accept', 'clear'],
+              },
+          }}
         />
       </LocalizationProvider>
     );
