@@ -6,9 +6,10 @@ import { SearchPanel } from "./components/SearchPanel/SearchPanel.js";
 import { useStopsStore } from "./store/StopsStore.js";
 import { StopInfo } from "./components/StopInfo/StopInfo.js";
 import {Toaster} from 'react-hot-toast';
+import { CSSTransition } from "react-transition-group";
 
 function App() {
-  const {getStops} = useStopsStore();
+  const { getStops, selectedStop, selectedStopSchedule } = useStopsStore();
   const {checkAuth} = useUserStore();
 
   useEffect(() => {
@@ -23,13 +24,24 @@ function App() {
       void fetchStops();
     }, [getStops]);
   
+  const isStopInfoVisible = !!(selectedStop || selectedStopSchedule);
+  
   return (
     
     <div style={{position: "relative"}}>
       <Map />
       <UserProfileComp />
       <SearchPanel />
-      <StopInfo />
+
+      <CSSTransition
+        in={isStopInfoVisible}
+        timeout={100}
+        classNames="stop-info"
+        unmountOnExit
+      >
+        <StopInfo />
+      </CSSTransition>
+
       <Toaster 
         position="top-center"
         toastOptions={{

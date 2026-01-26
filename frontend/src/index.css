@@ -57,4 +57,40 @@ h1, h2, h3, h4, h5, h6, p {
   --background: #eeeeeea7
 }
 
+/* stop info transitions */ 
+.stop-info-enter {
+  opacity: 0;
+}
 
+.stop-info-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.stop-info-exit {
+  opacity: 1;
+}
+
+.stop-info-exit-active {
+  opacity: 0;
+  transition:  opacity 300ms ease-out;
+}
+
+/* user Components transition */
+.user-panel-enter {
+  opacity: 0;
+}
+
+.user-panel-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.user-panel-exit {
+  opacity: 1;
+}
+
+.user-panel-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}

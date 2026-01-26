@@ -8,14 +8,13 @@ import { useRef, useState } from "react";
 import { DatePickerComponent, type DatePickerRef } from "../DatePicker/DatePicker";
 import { parseDateTimeString } from "../../utils/DateTimeParser";
 import { Loading } from "../Loading/Loading";
+import CloseIcon from '../../assets/icons/close.svg?react';
 
 export const StopInfo = () => {
     const datePickerRef = useRef<DatePickerRef>(null);
-    const { selectedStop, selectedStopSchedule, getStopInfo } = useStopsStore();
+    const {selectedStop, selectedStopSchedule, getStopInfo, clearSelectedSchedule } = useStopsStore();
     const [direction, setDirection] = useState<'arrivals' | 'departures'>('departures');
     const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
-
-    if (!selectedStop && !selectedStopSchedule) return null
 
     const handleDirectionChange = (newDirection: 'arrivals' | 'departures') => {
         setDirection(newDirection);
@@ -48,7 +47,8 @@ export const StopInfo = () => {
     };
 
     return (
-        <div className={css["stop-info"]}>
+        <div className={css["stop-info"]} >
+          <CloseIcon className={css['close']} onClick={clearSelectedSchedule} width={30} height={30}/>
             <div className={css['stop-name-cont']}>
                 <h2 className={css['stop-name']}>{selectedStop?.stop_name}</h2>
                 <div className={css["isochrone-icon"]}>

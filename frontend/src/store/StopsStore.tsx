@@ -15,7 +15,6 @@ interface StopsState {
   getStops: () => Promise<void>
   getStopInfo: (stopId: string, options?: StopinfoOptions ) => Promise<void>
   clearSelectedSchedule: () => void
- 
 }
 
 export const useStopsStore = create<StopsState>((set, get) => ({
@@ -64,6 +63,8 @@ export const useStopsStore = create<StopsState>((set, get) => ({
 
   clearSelectedSchedule: () => set({
     selectedStop: null,
-    selectedStopSchedule: null
-  })
+    selectedStopSchedule: null,
+    error: null
+  }),
+
 }))
