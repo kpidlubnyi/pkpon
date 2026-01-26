@@ -1,6 +1,6 @@
 import type { User } from '../../types';
 import css from './ProfileComponent.module.css';
-import LogoutIcon from '../../assets/icons/logout.svg';
+import LogoutIcon from '../../assets/icons/logout.svg?react';
 
 interface ProfileComponentProps {
     user: User;
@@ -22,7 +22,7 @@ export const ProfileComponent = ({ user, onLogout }: ProfileComponentProps) => {
                 </div>
                 <div className={css['logout']} onClick={onLogout}>
                     <button className={css['logout-btn']} >
-                        <img src={LogoutIcon} alt="Logout" className={css['logout-icon']} />
+                        <LogoutIcon className={css['logout-icon']} />
                     </button>
                 </div>
             </div>

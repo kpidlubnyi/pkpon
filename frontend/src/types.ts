@@ -54,3 +54,9 @@ export type Schedule = {
 export type GetScheduleRes = {
     schedule: Schedule[];
 }
+
+export interface StopinfoOptions {
+  direction?: 'arrivals' | 'departures';
+  date?: string | null;
+  time?: string | null
+}
