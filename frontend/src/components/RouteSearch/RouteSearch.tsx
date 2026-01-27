@@ -69,8 +69,10 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
         slotProps={{
           paper: {
             sx: {
+              fontFamily: 'var(--font-family)',
+              fontSize: 14,
               borderRadius: 7,
-              backgroundColor: '#eeeeeea7',
+              backgroundColor: '#eeeeee',
               width: 239,
               maxHeight: 'none',
               overflow: 'visible'
@@ -100,14 +102,16 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                 },
               },
               '& .MuiAutocomplete-option': {
+                fontFamily: 'var(--font-family)',
                 backgroundColor: '#c8c8c8c0',
                 borderRadius: 4,
                 mx: 1,
                 my: 0.5,
                 px: 2,
                 fontSize: 14,
+                transition: 'background-color 0.2s ease-out',
                 '&:hover': {
-                  backgroundColor: '#8db1cc60'
+                  backgroundColor: '#79b3f38b'
                 }
               },
             },
@@ -120,6 +124,8 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
             variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
+                fontFamily: 'var(--font-family)',
+                fontSize: 14,
                 borderRadius: 26,
                 backgroundColor: '#eeeeeea7',
                 height: 34,
@@ -178,8 +184,10 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
         slotProps={{
           paper: {
             sx: {
+              fontFamily: 'var(--font-family)',
+              fontSize: 14,
               borderRadius: 7,
-              backgroundColor: '#eeeeeea7',
+              backgroundColor: '#eeeeee',
               width: 239,
               maxHeight: 'none',
               overflow: 'visible'
@@ -209,14 +217,16 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                 },
               },
               '& .MuiAutocomplete-option': {
+                fontFamily: 'var(--font-family)',
                 backgroundColor: '#c8c8c8c0',
                 borderRadius: 4,
                 mx: 1,
                 my: 0.5,
                 px: 2,
                 fontSize: 14,
+                transition: 'background-color 0.2s ease-out',
                 '&:hover': {
-                  backgroundColor: '#8db1cc60'
+                  backgroundColor: '#79b3f38b'
                 }
               },
             },
@@ -229,6 +239,8 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
             variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
+                fontFamily: 'var(--font-family)',
+                fontSize: 14,
                 borderRadius: 26,
                 backgroundColor: '#eeeeeea7',
                 height: 34,
