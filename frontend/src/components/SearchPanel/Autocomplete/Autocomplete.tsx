@@ -56,8 +56,10 @@ export const Search = () => {
             slotProps={{
                 paper: {
                     sx: {
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 14,
                         borderRadius: 7,
-                        backgroundColor: '#eeeeeea7',
+                        backgroundColor: '#eeeeee',
                         width: 239,
                         maxHeight: 'none',
                         overflow: 'visible'
@@ -88,13 +90,15 @@ export const Search = () => {
                         },
                         '& .MuiAutocomplete-option': {
                             backgroundColor: '#c8c8c8c0',
+                            fontFamily: 'var(--font-family)',
                             borderRadius: 4,
                             mx: 1,
                             my: 0.5,
                             px: 2,
                             fontSize: 14,
+                            transition: 'background-color 0.2s ease-out',
                             '&:hover': {
-                                backgroundColor: '#8db1cc60'
+                                backgroundColor: '#79b3f38b'
                             }
                         },
                        
@@ -105,6 +109,8 @@ export const Search = () => {
                 variant="outlined"
                 sx={{
                     '& .MuiOutlinedInput-root': {
+                        fontFamily: 'var(--font-family)',
+                        fontSize: 14,
                         borderRadius: 26,
                         backgroundColor: '#eeeeeea7',
                         height: 34,

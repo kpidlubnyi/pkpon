@@ -27,4 +27,9 @@
     width: 68px;
     height: 68px;
     border-radius: 50%;
-};
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.user-icon:hover {
+    box-shadow: var(--sm-shadow);
+}
