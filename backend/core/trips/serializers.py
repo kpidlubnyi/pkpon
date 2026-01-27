@@ -146,6 +146,7 @@ class UserTripSearchCompleteTripSerializer(BaseCompleteTripSerializer):
 
     class Meta(BaseCompleteTripSerializer.Meta):
         fields = (
+           'trip_ids',
             'routes',
             'legs',
             'plk_train_number',
