@@ -1,0 +1,137 @@
+.route-results-container {
+    position: absolute;
+    z-index: 999;
+    top: 100px;
+    left: 50px;
+    max-width: 412px;
+    max-height: 75vh;
+    background: var(--winter-gradient);
+    border-radius: 26px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.route-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    background: #eeeeeea7;
+    border-radius: 26px;
+    box-shadow: var(--sm-shadow);
+}
+
+.route-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-family);
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.7);
+    margin: 0;
+    text-align: center;
+}
+
+.route-title {
+    color: #000000;
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: var(--font-medium);
+    margin: 0;
+    text-align: center;
+}
+
+.route-info:last-child {
+    font-size: 13px;
+}
+.routes-scroll {
+    overflow-y: auto;
+    max-height: calc(75vh - 180px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px;
+    border-radius: 26px;
+}
+
+.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    padding: 40px 20px;
+    font-family: var(--font-family);
+}
+
+.no-results:first-child {
+    font-size: 20px;
+    margin: 4px 0;
+    text-align: center;
+    color: #0000009d;
+}
+
+.no-results-hint {
+    font-size: 14px;
+}
+
+.route-card {
+    background: #ffffffdf;
+    border-radius: 26px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--sm-shadow);
+    border: 2px solid transparent;
+}
+
+.route-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 1);
+}
+
+.route-card.selected {
+    border-color: var(--primary-blue);
+    background: rgba(230, 240, 255, 0.98);
+}
+
+.time-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-family);
+}
+
+.departure-time,
+.arrival-time {
+    font-size: 22px;
+    font-weight: var(--font-bold);
+    color: #000000;
+    letter-spacing: -0.5px;
+}
+
+.duration-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.duration {
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: var(--font-medium);
+    color: #1a1a1a;
+}
+
+.transfers {
+    font-family: var(--font-family);
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
