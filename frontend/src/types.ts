@@ -60,3 +60,42 @@ export interface StopinfoOptions {
   date?: string | null;
   time?: string | null
 }
+
+//Trips types
+export interface TripSearchParams {
+    from_stop: string;  
+    to_stop: string;    
+    date?: string;      
+    time?: string;   
+}
+
+export interface Route {
+    route_id: string;
+    route_short_name: string;
+    route_long_name: string;
+    route_type: number;
+}
+
+export interface StopTime {
+    trip_id: string;
+    stop: Stop;
+    stop_sequence: number;
+    arrival_time: string;
+    departure_time: string;
+    platform?: number;
+    track?: number;
+    fare_dist_m?: number;
+    vehicle_kind: string;
+}
+
+export interface MatchingTrip {
+    routes: Route[];
+    legs: number;  // number of trip segments
+    plk_train_number: (string | null)[];
+    departure_stop_time: Schedule;  // uses ScheduleStopTimeSerializer
+    arrival_stop_time: Schedule;    // uses ScheduleStopTimeSerializer
+}
+
+export interface TripSearchResponse {
+    matching_trips: MatchingTrip[];
+}

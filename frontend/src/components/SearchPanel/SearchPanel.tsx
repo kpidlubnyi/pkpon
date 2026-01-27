@@ -4,9 +4,42 @@ import StopIcon from '../../assets/icons/stop-icon.svg?react';
 import css from './SearchPanel.module.css'
 import { useState } from "react";
 import { Search } from './Autocomplete/Autocomplete';
+import { RouteSearch } from '../RouteSearch/RouteSearch';
+import { useRouteStore } from '../../store/RouteStore';
+import dayjs from 'dayjs';
+import type { Stop } from '../../types';
+import { useStopsStore } from '../../store/StopsStore';
 
 export const SearchPanel = () => {
     const [active, setActive] = useState<'left' | 'right'>('right');
+    const { searchTrips, clearTrips } = useRouteStore();
+    const { clearSelectedSchedule } = useStopsStore();
+
+    const handleTripSearch = (from: Stop, to: Stop) => {
+        const currTime = dayjs();
+
+        void searchTrips({
+            from_stop: from.stop_id,
+            to_stop: to.stop_id,
+            date: currTime.format('YYYY-MM-DD'),
+            time: currTime.format('HH:mm:ss'),
+        },
+            from,
+            to,
+        );
+    };
+
+    const handleToggle = (side: 'left' | 'right') => {
+        setActive(side);
+
+        if (side === 'left') {
+            clearSelectedSchedule();
+        }
+
+        if (side === 'right') {
+            clearTrips();
+        }
+    };
 
     return (
         <div className={css["search-panel"]}>
@@ -25,20 +58,24 @@ export const SearchPanel = () => {
                     />
                     <button
                         className={css['toggle-btn']}
-                        onClick={() => setActive('left')}
+                        onClick={() => handleToggle('left')}
                     >
                         <TrainIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "left" ? css["active"] : ''}`} />
                     </button>
                     <button
                         className={css['toggle-btn']}
-                        onClick={() => setActive('right')}
+                        onClick={() => handleToggle('right')}
                     >
                         <StopIcon width={32} height={32} className={`${css["toggle-icon"]} ${active === "right" ? css["active"] : ''}`} />
                     </button>
                 </div>
             </div>
 
-            <Search />
+            {active === 'left' ? (
+                <RouteSearch onRouteSearch={handleTripSearch}/>
+            ) : (
+                <Search />
+            )}
         </div>
     );
 }

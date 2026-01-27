@@ -1,4 +1,4 @@
-import type { GetScheduleRes, GetStopsResponse } from "../types";
+import type { GetScheduleRes, GetStopsResponse, TripSearchParams, TripSearchResponse } from "../types";
 import {api} from './authService'
 import type { StopinfoOptions } from "../types";
 
@@ -16,8 +16,19 @@ export const stopApi = {
                 time: params?.time,
             }
         })
-        console.log(res.data)
         return res.data
+    },
+
+    searchTrips: async (params: TripSearchParams): Promise<TripSearchResponse> => {
+        const res = await api.get<TripSearchResponse>('/trips/search/', {
+            params: {
+                from_stop: params.from_stop,
+                to_stop: params.to_stop,
+                date: params.date,
+                time: params.time,
+            }
+        });
+        return res.data;
     }
 };
 

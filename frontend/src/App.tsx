@@ -7,9 +7,12 @@ import { useStopsStore } from "./store/StopsStore.js";
 import { StopInfo } from "./components/StopInfo/StopInfo.js";
 import {Toaster} from 'react-hot-toast';
 import { CSSTransition } from "react-transition-group";
+import { TripResults } from "./components/TripResults/TripResults.js";
+import { useRouteStore } from "./store/RouteStore.js";
 
 function App() {
   const { getStops, selectedStop, selectedStopSchedule } = useStopsStore();
+  const { selectedTrip, matchingTrips } = useRouteStore();
   const {checkAuth} = useUserStore();
 
   useEffect(() => {
@@ -25,24 +28,35 @@ function App() {
     }, [getStops]);
   
   const isStopInfoVisible = !!(selectedStop || selectedStopSchedule);
+  const isTripsVisible = !!(selectedTrip || matchingTrips)
   
   return (
     
-    <div style={{position: "relative"}}>
+    <div style={{ position: "relative" }}>
       <Map />
       <UserProfileComp />
       <SearchPanel />
+      
+      {selectedTrip ?
+        <CSSTransition
+          in={isTripsVisible}
+          timeout={200}
+          classNames="route-results-container"
+          unmountOnExit
+        >
+          <TripResults />
+        </CSSTransition>
+        :
+        <CSSTransition
+          in={isStopInfoVisible}
+          timeout={100}
+          classNames="stop-info"
+          unmountOnExit
+        >
+          <StopInfo />
+        </CSSTransition>}
 
-      <CSSTransition
-        in={isStopInfoVisible}
-        timeout={100}
-        classNames="stop-info"
-        unmountOnExit
-      >
-        <StopInfo />
-      </CSSTransition>
-
-      <Toaster 
+      <Toaster
         position="top-center"
         toastOptions={{
           duration: 3000,
