@@ -1,5 +1,5 @@
 import { useRouteStore } from '../../store/RouteStore';
-import { formatTime } from '../../utils/FormatTime';
+import { normalizeTime } from '../../utils/FormatTime';
 import css from './TripResults.module.css';
 import { Loading } from '../Loading/Loading';
 import type { MatchingTrip } from '../../types';
@@ -75,6 +75,8 @@ export const TripResults = () => {
             trip.arrival_stop_time.arrival_time
           );
           const transferCount = getTransferCount(trip);
+          const departureNormalized = normalizeTime(trip.departure_stop_time.departure_time);
+          const arrivalNormalized = normalizeTime(trip.arrival_stop_time.arrival_time);
 
           return (
             <div
@@ -84,14 +86,14 @@ export const TripResults = () => {
             >
                 <div className={css['time-info']}>
                   <span className={css['departure-time']}>
-                    {formatTime(trip.departure_stop_time.departure_time)}
+                  {departureNormalized.time} {departureNormalized.daysOffset && <small className={css['day-offset']}>{departureNormalized.daysOffset }</small>}
                   </span>
                   <div className={css['duration-info']}>
                     <span className={css['duration']}>{formatDuration(duration)}</span>
                     <span className={css['transfers']}>{formatTransfers(transferCount)}</span>
                   </div>
                   <span className={css['arrival-time']}>
-                    {formatTime(trip.arrival_stop_time.arrival_time)}
+                  {arrivalNormalized.time} {arrivalNormalized.daysOffset && <small className={css['day-offset']}>{arrivalNormalized.daysOffset}</small>}
                   </span>
                 </div>
               </div>
