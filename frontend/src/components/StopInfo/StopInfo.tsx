@@ -1,5 +1,5 @@
 import { useStopsStore } from "../../store/StopsStore"
-import { formatTime } from "../../utils/FormatTime";
+import { normalizeTime } from "../../utils/FormatTime";
 import css from './StopInfo.module.css';
 import CalenderIcon from '../../assets/icons/calender.svg?react';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
@@ -100,15 +100,21 @@ export const StopInfo = () => {
                         </h2>
                     ) : (
                         <ul className={css['schedule-list']}>
-                            {selectedStopSchedule?.schedule.map((item, i) => (
-                                <li key={i} className={css['schedule-item']}>
-                                    <div className={css['time']}>
-                                        {formatTime(direction === 'arrivals' ? item.arrival_time : item.departure_time)}
-                                    </div>
-                                    <ArrowIcon width={20} height={20} />
-                                    <div className={css["trip-to"]}>{item.trip_headsign}</div>
-                                </li>
-                            ))}
+                            {selectedStopSchedule?.schedule.map((item, i) => {
+                                const timeString = direction === 'arrivals' ? item.arrival_time : item.departure_time;
+                                const { time, daysOffset } = normalizeTime(timeString);
+                                
+                                return (
+                                    <li key={i} className={css['schedule-item']}>
+                                        <div className={css['time-wrapper']}>
+                                            <div className={css['time']}>{time}</div>
+                                            {daysOffset && <small className={css['day-offset']}>{daysOffset}</small>}
+                                        </div>
+                                        <ArrowIcon width={20} height={20} />
+                                        <div className={css["trip-to"]}>{item.trip_headsign}</div>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                 </div>
