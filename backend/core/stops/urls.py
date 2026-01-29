@@ -6,4 +6,5 @@ from .views import *
 urlpatterns = [
     path('', AllStopsView.as_view()),
     path('<str:stop_id>/schedule', StopScheduleView.as_view(), name='stop_schedule'),
+    path('<str:stop_id>/isochrone', StopIsochroneView.as_view(), name='stop_isochrone'),
 ]
