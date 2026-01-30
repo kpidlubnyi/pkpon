@@ -29,6 +29,11 @@ export const stopApi = {
             }
         });
         return res.data;
-    }
+    },
+
+    getTripDetails: async (id: string) => {
+        const res = await api.get(`/trips/${id}/`);
+        return res.data;
+    } 
 };
 

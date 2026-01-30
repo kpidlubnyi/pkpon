@@ -97,7 +97,7 @@ export const Search = () => {
                             px: 2,
                             fontSize: 14,
                             transition: 'background-color 0.2s ease-out',
-                            '&:hover': {
+                            '&:hover, &.Mui-focused': {
                                 backgroundColor: '#79b3f38b'
                             }
                         },

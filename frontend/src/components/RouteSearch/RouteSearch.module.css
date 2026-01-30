@@ -72,3 +72,71 @@
     cursor: not-allowed;
     background: #808080;
 }
+.date-picker-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.calendar-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #d2cfcf76;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: var(--sm-shadow);
+    color: #000;
+}
+
+.calendar-button:hover {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+.calendar-button.active {
+    background: var(--primary-blue);
+    color: #fff;
+    outline: 4px solid var(--primary-hover);
+}
+
+.calendar-button * {
+    transition: color 0.3s ease-in-out;
+}
+
+.search-button {
+    font-family: var(--font-family);
+    font-weight: var(--font-medium);
+    font-size: 14px;
+    padding: 8px 24px;
+    height: 40px;
+    border-radius: 26px;
+    border: none;
+    background: var(--primary-blue);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: var(--sm-shadow);
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+}
+
+.search-button:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 6px -1px rgba(0, 0, 0, 0.25);
+}
+
+.search-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--sm-shadow);
+}
+
+.search-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #808080;
+}
