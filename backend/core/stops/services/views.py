@@ -220,19 +220,26 @@ def get_isochrone_map(stop_id:str, hours:int):
         for s in stops_qs
     }
 
-    for i in range(1, hours + 1):
-        if (cached := get_cached_stop_isochrone(stop_id, i)):
+    empty = ()
+    for h in range(1, hours + 1):
+        if (cached := get_cached_stop_isochrone(stop_id, h)):
             new_ones = cached
             new_ones_set = set(new_ones)
         else:
-            area = calculate_area(stop_loc, i)
+            try:
+                area = calculate_area(stop_loc, h)
+            except:
+                set_cached_stop_isochrone(stop_id, h, empty)
+                layers[hours - h] = empty                
+                continue
+
             stops_in_area = filter_stop_ids_by_area(stop_points, area)
             
             new_ones_set = stops_in_area - already_in
             new_ones = list(new_ones_set)
-            set_cached_stop_isochrone(stop_id, i, new_ones)
+            set_cached_stop_isochrone(stop_id, h, new_ones)
         
-        layers[hours - i] = new_ones
+        layers[hours - h] = new_ones
         already_in.update(new_ones_set)
 
     return layers
