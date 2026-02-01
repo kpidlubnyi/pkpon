@@ -121,9 +121,6 @@ def create_isochrone_cache():
                 _ = get_isochrone_map(stop_id, level)
                 created_layers += 1
                 break
-        else:
-            _ = get_isochrone_map(stop_id, 1)
-            created_layers += 1
 
         logger.info(f"Created isochrone cache for the stop with id '{stop_id}' with {level} priority level.")
     
