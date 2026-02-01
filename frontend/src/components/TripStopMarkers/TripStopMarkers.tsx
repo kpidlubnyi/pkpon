@@ -3,6 +3,7 @@ import { Marker, Tooltip, useMap } from 'react-leaflet';
 import { tripMarker } from '../MarkerIcons/MarkerIcons';
 import { useEffect, useState } from 'react';
 import type { TripDetails } from '../../types';
+import { useRouteStore } from '../../store/RouteStore';
 
 interface TripStopMarkersProps {
   tripDetails: TripDetails | null;
@@ -13,6 +14,8 @@ interface TripStopMarkersProps {
 export const TripStopMarkers = ({ tripDetails, fromStopId, toStopId }: TripStopMarkersProps) => {
   const map = useMap();
   const [zoomed, setZoomed] = useState(map.getZoom());
+  
+  const { showFullRoute } = useRouteStore();
 
   useEffect(() => {
     const handleZoom = () => setZoomed(map.getZoom());
@@ -23,7 +26,7 @@ export const TripStopMarkers = ({ tripDetails, fromStopId, toStopId }: TripStopM
   }, [map]);
 
   const routeStops = useMemo(() => {
-    if (!tripDetails?.trip_stop_times || !fromStopId || !toStopId) {
+    if (!tripDetails?.trip_stop_times) {
       return [];
     }
 
@@ -50,6 +53,22 @@ export const TripStopMarkers = ({ tripDetails, fromStopId, toStopId }: TripStopM
       });
     });
 
+    if (showFullRoute) {
+      const seen = new Set<string>();
+      const uniqueStops = allStops.filter((stop) => {
+        if (seen.has(stop.stop_id)) {
+          return false;
+        }
+        seen.add(stop.stop_id);
+        return true;
+      });
+      return uniqueStops;
+    }
+
+    if (!fromStopId || !toStopId) {
+      return [];
+    }
+
     const fromIndex = allStops.findIndex((s) => s.stop_id === fromStopId);
     const toIndex = allStops.findIndex((s) => s.stop_id === toStopId);
 
@@ -72,7 +91,7 @@ export const TripStopMarkers = ({ tripDetails, fromStopId, toStopId }: TripStopM
     });
 
     return uniqueStops;
-  }, [tripDetails, fromStopId, toStopId]);
+  }, [tripDetails, fromStopId, toStopId, showFullRoute]); 
 
   if (routeStops.length === 0) {
     return null;

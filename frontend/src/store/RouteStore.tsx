@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 
 interface RouteState {
   matchingTrips: MatchingTrip[];
-  selectedTrip: MatchingTrip | null;
   tripDetails: TripDetails | null;
   searchParams: {
     from_stop: Stop | null;
@@ -13,23 +12,26 @@ interface RouteState {
   } | null;
   isSearching: boolean;
   isDetailsLoading: boolean;
+  showFullRoute: boolean;
   error: string | null;
   
   searchTrips: (params: TripSearchParams, fromStop: Stop, toStop: Stop) => Promise<void>;
-  selectTrip: (trip: MatchingTrip | null) => void;
-  loadDetails: (tripId: string) => Promise<void>;
+  selectTrip: (trip: MatchingTrip | null) => Promise<void>;
   clearTrips: () => void;
+  setShowFullRoute: (show: boolean) => void;
 }
 
 export const useRouteStore = create<RouteState>((set) => ({
   matchingTrips: [],
-  selectedTrip: null,
   tripDetails: null,
   searchParams: null,
   isSearching: false,
   isDetailsLoading: false,
+  showFullRoute: false,
   error: null,
-
+  
+  setShowFullRoute: (show) => set({ showFullRoute: show }),
+  
   searchTrips: async (params: TripSearchParams, fromStop: Stop, toStop: Stop) => {
     set({ isSearching: true, error: null });
     try {
@@ -42,9 +44,8 @@ export const useRouteStore = create<RouteState>((set) => ({
           to_stop: toStop,
         },
         isSearching: false,
-        selectedTrip: res.matching_trips.length > 0 ? res.matching_trips[0] : null,
-        tripDetails: null,
       });
+      console.log(res.matching_trips)
       if (res.matching_trips.length === 0) {
         toast.error('Nie znaleziono połączeń dla wybranych kryteriów');
       } else {
@@ -57,23 +58,24 @@ export const useRouteStore = create<RouteState>((set) => ({
         isSearching: false, 
         error: 'Failed to search trips',
         matchingTrips: [],
-        selectedTrip: null,
       });
     }
   },
 
-  selectTrip: (trip) => {
-    set({ selectedTrip: trip, tripDetails: null });
-  },
-
-  loadDetails: async (tripId: string) => {
-    set({ isDetailsLoading: true });
-    try {
-      const details = await stopApi.getTripDetails(tripId);
+  selectTrip: async (trip) => {
+    if (!trip) {
+      set({ tripDetails: null });
+      return
+    }
+    const firstTripId = trip.trip_ids[0];
+    console.log(trip);
+      try {
+      const details = await stopApi.getTripDetails(firstTripId);
       set({
         tripDetails: details,
         isDetailsLoading: false, 
       })
+      console.log(details);
     } catch (error) {
       console.error('Error loading details for this trip', error);
       set({
@@ -81,12 +83,11 @@ export const useRouteStore = create<RouteState>((set) => ({
         error: 'Failet to load details',
       });
     }
-},
-  
+  },
+
   clearTrips: () => {
     set({
       matchingTrips: [],
-      selectedTrip: null,
       tripDetails: null,
       searchParams: null,
       error: null,

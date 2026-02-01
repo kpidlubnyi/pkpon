@@ -80,7 +80,7 @@
 }
 
 .route-card {
-    background: #ffffffdf;
+    background: var(--light-bg);
     border-radius: 26px;
     padding: 16px;
     cursor: pointer;

@@ -95,6 +95,8 @@ export interface TripSearchResponse {
 
 export interface TripDetails {
     trip_route_name: string;
+    trip_short_name: string;
+    plk_train_number: string;
     trip_headsign: string | null;
     routes: string[];
     legs: number;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Polyline } from 'react-leaflet';
 import { useRouteStore } from '../../store/RouteStore';
 import polyline from '@mapbox/polyline';
@@ -6,17 +6,24 @@ import polyline from '@mapbox/polyline';
 const SEGMENT_COLORS = ['#3a62ff', '#ff5719', '#a323ff', '#ff006e', '#8338ec'];
 
 export const TripPolyline = () => {
-  const { selectedTrip, tripDetails, loadDetails, searchParams } = useRouteStore();
-
-  useEffect(() => {
-    if (selectedTrip && !tripDetails) {
-      const firstTripId = selectedTrip.trip_ids[0];
-      void loadDetails(firstTripId);
-    }
-  }, [selectedTrip, tripDetails, loadDetails]);
+  const { tripDetails, searchParams, showFullRoute } = useRouteStore();
 
   const segments = useMemo<Array<{ positions: [number, number][]; color: string }>>(() => {
     if (!tripDetails?.polylines || !tripDetails?.trip_stop_times || !searchParams) {
+      return [];
+    }
+
+ if (showFullRoute) {
+      return tripDetails.polylines.map((encodedPolyline, index) => {
+        const allPositions = polyline.decode(encodedPolyline);
+        return {
+          positions: allPositions,
+          color: SEGMENT_COLORS[index % SEGMENT_COLORS.length],
+        };
+      });
+    }
+
+    if (!searchParams) {
       return [];
     }
 
@@ -110,7 +117,7 @@ export const TripPolyline = () => {
     });
 
     return segments;
-  }, [tripDetails, searchParams]);
+  }, [tripDetails, searchParams, showFullRoute]);
 
   if (segments.length === 0) {
     return null;

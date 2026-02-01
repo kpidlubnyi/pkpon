@@ -1,0 +1,202 @@
+.trip-details-container {
+    color: #000000;
+    font-family: var(--font-family);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.up-panel {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.header-section {
+    width: 100%;
+}
+
+.back-btn {
+    width: 32px;
+    height: 32px;
+    background-color: var(--light-bg);
+    top: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.back-btn:hover {
+    box-shadow: var(--sm-shadow);
+}
+
+.label {
+    font-size: 12px;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-left: 12px;
+    margin-bottom: 4px;
+}
+
+.route-name {
+    font-size: 14px;
+    font-weight: var(--font-bold);
+    background: var(--light-bg);
+    padding: 14px;
+    border-radius: 26px;
+    transition: all 0.3s ease-out;
+    cursor: pointer;
+}
+
+.route-name:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sm-shadow);
+}
+
+.forward-btn {
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    outline: none;
+    right: 4px;
+    top: 40%;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.forward-btn:hover {
+    transform: translateX(2px);
+}
+
+.distance-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding-right: 12px;
+}
+
+.distance-value {
+    font-size: 12px;
+    font-weight: var(--font-medium);
+}
+
+.stops {
+    background: var(--light-bg);
+    padding: 16px;
+    border-radius: 26px;
+    min-height: 200px;
+}
+
+.time-platform {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.dep-stop {
+    display: flex;
+    gap: 8px;
+}
+
+.departure-time {
+    font-size: 18px;
+    font-weight: var(--font-bold);
+}
+
+.station-name {
+    font-size: 18px;
+    font-weight: var(--font-regular);
+}
+
+.platform-info {
+    font-size: 12px;
+    color: #666666;
+    display: flex;
+    gap: 8px;
+}
+.badged {
+    background-color: #d5d5d5;
+    color: #000000;
+    border-radius: 5px;
+    padding: 0 4px;
+}
+.route-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.carrier-badge {
+    background: #000000;
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: var(--font-bold);
+    min-width: 40px;
+    text-align: center;
+}
+
+.arrow-icon {
+    width: 16px;
+    height: 16px;
+    color: #666666;
+}
+
+.final-destination {
+    font-size: 14px;
+    font-weight: var(--font-medium);
+    color: #000000;
+}
+
+.train-number {
+    font-size: 13px;
+    color: #666666;
+    font-weight: var(--font-medium);
+    margin-bottom: 8px;
+}
+
+.stops-list {
+    list-style: none;
+    max-height: 270px;
+    overflow-y: auto;
+}
+.stop-item {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stop-item:last-child {
+    border-bottom: none;
+}
+
+.stop-time {
+    font-size: 14px;
+    font-weight: var(--font-medium);
+    min-width: 50px;
+}
+
+.stop-name {
+    font-size: 14px;
+    color: #333333;
+}
+
+.transfers-section {
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.transfers-list {
+    margin-top: 8px;
+}

@@ -12,7 +12,7 @@ import { useRouteStore } from "./store/RouteStore.js";
 
 function App() {
   const { getStops, selectedStop, selectedStopSchedule } = useStopsStore();
-  const { selectedTrip, matchingTrips } = useRouteStore();
+  const { matchingTrips } = useRouteStore();
   const {checkAuth} = useUserStore();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ function App() {
     }, [getStops]);
   
   const isStopInfoVisible = !!(selectedStop || selectedStopSchedule);
-  const isTripsVisible = !!(selectedTrip || matchingTrips)
+  const isTripsVisible = !!( matchingTrips)
   
   return (
     
@@ -37,7 +37,7 @@ function App() {
       <UserProfileComp />
       <SearchPanel />
       
-      {selectedTrip ?
+      {matchingTrips.length > 0?
         <CSSTransition
           in={isTripsVisible}
           timeout={200}
