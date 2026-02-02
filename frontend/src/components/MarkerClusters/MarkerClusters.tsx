@@ -1,5 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { getData } from "../../api/api";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { Marker, Tooltip, useMap } from "react-leaflet";
 import { stationMarker } from "../MarkerIcons/MarkerIcons.ts";

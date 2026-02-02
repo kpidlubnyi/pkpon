@@ -7,13 +7,15 @@ import { useState } from "react";
 import type { LatLng } from "leaflet";
 import { useStopsStore } from "../../store/StopsStore.tsx";
 import { MapController } from "../MapController/MapController.tsx";
+import { TripPolyline } from "../TripPolyline/TripPolyline.tsx";
+import { useRouteStore } from "../../store/RouteStore.tsx";
+import { TripStopMarkers } from "../TripStopMarkers/TripStopMarkers.tsx";
 
 
 export const Map = () => {
   const [position, setPosition] = useState<LatLng | null>(null);
-  const {stops} = useStopsStore()
-
-
+  const { stops } = useStopsStore();
+  const { matchingTrips, tripDetails, searchParams } = useRouteStore();
 
   return (
     <div style={{ position: "relative" }}>
@@ -26,16 +28,22 @@ export const Map = () => {
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a> &amp; <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a>'
-          url="https://api.maptiler.com/maps/dataviz-light/256/{z}/{x}/{y}.png?key=Wds0noUluChrbsvv6WDv"
+          url="https://api.maptiler.com/maps/dataviz-light/256/{z}/{x}/{y}.png?key=DyARaDXHWKrnJxTiqqnW"
         />
 
         <LocateButton setPosition={setPosition} />
         {position && <LocationMarker position={position} />}
-        {/* 
-        {!hasRoute && <MarkerClusters />}
-        {hasRoute && <RouteLayer />} */}
-        <MapController/>
-        <MarkerClusters stops={stops} />
+        
+        <MapController />
+        {matchingTrips.length === 0 && <MarkerClusters stops={stops} />}
+
+        <TripPolyline />
+        {searchParams?.from_stop && searchParams?.to_stop && (
+          <TripStopMarkers
+            tripDetails={tripDetails}
+            fromStopId={searchParams.from_stop.stop_id}
+          toStopId={searchParams.to_stop.stop_id} />
+        )}
         <ZoomControl position="bottomright" />
       </MapContainer>
     </div>

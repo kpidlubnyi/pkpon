@@ -11,7 +11,6 @@ export const stationMarker = L.divIcon({
   iconAnchor: [8, 8],
 });
 
-
 export const meMarker = L.divIcon({
    html: `
     <svg width="17" height="17" viewBox="0 0 16 16">
@@ -22,3 +21,14 @@ export const meMarker = L.divIcon({
   iconSize: [32, 32],
   iconAnchor: [8, 8],
 })
+
+export const tripMarker = L.divIcon({
+  html: `
+    <svg width="10" height="10" viewBox="0 0 16 16">
+      <circle cx="8" cy="8" r="6" fill="#fff" stroke="#000000" stroke-width="4"/>
+    </svg>
+  `,
+  className: "trip-marker",
+  iconSize: [4, 4],
+  iconAnchor: [8, 8],
+});

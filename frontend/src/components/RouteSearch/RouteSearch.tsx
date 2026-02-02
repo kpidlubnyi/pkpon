@@ -1,16 +1,20 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useStopsStore } from "../../store/StopsStore";
 import type { Stop } from "../../types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import css from './RouteSearch.module.css';
 import SwapIcon from '../../assets/icons/swap.svg?react';
+import CalenderIcon from '../../assets/icons/calender.svg?react';
+import { DatePickerComponent, type DatePickerRef } from "../DatePicker/DatePicker";
+import { parseDateTimeString } from "../../utils/DateTimeParser";
 
 interface RouteSearchProps {
-  onRouteSearch?: (from: Stop, to: Stop) => void;
+  onRouteSearch?: (from: Stop, to: Stop, date?: string, time?: string) => void;
 }
 
 export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
   const { stops } = useStopsStore();
+  const datePickerRef = useRef<DatePickerRef>(null);
   
   const [fromInputValue, setFromInputValue] = useState('');
   const [fromValue, setFromValue] = useState<Stop | null>(null);
@@ -18,9 +22,12 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
   const [toInputValue, setToInputValue] = useState('');
   const [toValue, setToValue] = useState<Stop | null>(null);
 
+  const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
+
   const handleSearch = () => {
     if (fromValue && toValue) {
-      onRouteSearch?.(fromValue, toValue);
+      const { date, time } = parseDateTimeString(selectedDateTime);
+      onRouteSearch?.(fromValue, toValue, date ?? undefined, time ?? undefined);
     }
   };
 
@@ -32,6 +39,14 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
     setFromInputValue(toInputValue);
     setToValue(tempValue);
     setToInputValue(tempInputValue);
+  };
+
+  const handleCalendarClick = () => {
+    datePickerRef.current?.openPicker();
+  };
+
+  const handleDateTimeChange = (dateTime: string | null) => {
+    setSelectedDateTime(dateTime);
   };
 
   return (
@@ -50,8 +65,8 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
           fromInputValue.length === 0
             ? []
             : options.filter(o =>
-                o.stop_name.toLowerCase().includes(fromInputValue.toLowerCase())
-              )
+              o.stop_name.toLowerCase().includes(fromInputValue.toLowerCase())
+            )
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
@@ -110,7 +125,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                 px: 2,
                 fontSize: 14,
                 transition: 'background-color 0.2s ease-out',
-                '&:hover': {
+                '&:hover, &.Mui-focused': {
                   backgroundColor: '#79b3f38b'
                 }
               },
@@ -142,7 +157,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
         )}
       />
 
-      <button 
+      <button
         className={css['swap-button']}
         onClick={handleSwap}
         aria-label="Zamień miejscami"
@@ -165,8 +180,8 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
           toInputValue.length === 0
             ? []
             : options.filter(o =>
-                o.stop_name.toLowerCase().includes(toInputValue.toLowerCase())
-              )
+              o.stop_name.toLowerCase().includes(toInputValue.toLowerCase())
+            )
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
@@ -225,7 +240,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                 px: 2,
                 fontSize: 14,
                 transition: 'background-color 0.2s ease-out',
-                '&:hover': {
+                '&:hover, &.Mui-focused': {
                   backgroundColor: '#79b3f38b'
                 }
               },
@@ -256,6 +271,22 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
           />
         )}
       />
+
+      <div className={css['date-picker-wrapper']}>
+        <div style={{ position: "absolute", top: 0, left: 0, opacity: 0, pointerEvents: 'none' }}>
+          <DatePickerComponent
+            ref={datePickerRef}
+            onDateTimeChange={handleDateTimeChange}
+          />
+        </div>
+        <button
+          className={`${css['calendar-button']} ${selectedDateTime ? css['active'] : ''}`}
+          onClick={handleCalendarClick}
+          aria-label="Wybierz datę i czas"
+        >
+          <CalenderIcon width={20} height={20} />
+        </button>
+      </div>
 
       <button
         className={css['search-button']}

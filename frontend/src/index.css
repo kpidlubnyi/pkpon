@@ -54,7 +54,8 @@ h1, h2, h3, h4, h5, h6, p {
   --title: 24px;
   --subtitle: 16px;
   --body: 14px;
-  --background: #eeeeeea7
+  --background: #eeeeeea7;
+  --light-bg: #ffffffdf;
 }
 
 /* stop info transitions */ 

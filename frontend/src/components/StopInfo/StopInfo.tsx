@@ -107,8 +107,9 @@ export const StopInfo = () => {
                                 return (
                                     <li key={i} className={css['schedule-item']}>
                                         <div className={css['time-wrapper']}>
-                                            <div className={css['time']}>{time}</div>
-                                            {daysOffset && <small className={css['day-offset']}>{daysOffset}</small>}
+                                            <div className={css['time']}>{time}
+                                                {daysOffset && <small className={css['day-offset']}>{daysOffset}</small>}
+                                            </div>
                                         </div>
                                         <ArrowIcon width={20} height={20} />
                                         <div className={css["trip-to"]}>{item.trip_headsign}</div>

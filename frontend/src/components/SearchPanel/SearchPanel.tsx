@@ -15,14 +15,14 @@ export const SearchPanel = () => {
     const { searchTrips, clearTrips } = useRouteStore();
     const { clearSelectedSchedule } = useStopsStore();
 
-    const handleTripSearch = (from: Stop, to: Stop) => {
+    const handleTripSearch = (from: Stop, to: Stop, date?: string, time?: string) => {
         const currTime = dayjs();
 
         void searchTrips({
             from_stop: from.stop_id,
             to_stop: to.stop_id,
-            date: currTime.format('YYYY-MM-DD'),
-            time: currTime.format('HH:mm:ss'),
+            date: date ?? currTime.format('YYYY-MM-DD'),
+            time: time ?? currTime.format('HH:mm:ss'),
         },
             from,
             to,

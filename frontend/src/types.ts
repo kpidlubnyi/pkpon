@@ -69,13 +69,6 @@ export interface TripSearchParams {
     time?: string;   
 }
 
-export interface Route {
-    route_id: string;
-    route_short_name: string;
-    route_long_name: string;
-    route_type: number;
-}
-
 export interface StopTime {
     trip_id: string;
     stop: Stop;
@@ -89,13 +82,26 @@ export interface StopTime {
 }
 
 export interface MatchingTrip {
-    routes: Route[];
-    legs: number;  // number of trip segments
-    plk_train_number: (string | null)[];
-    departure_stop_time: Schedule;  // uses ScheduleStopTimeSerializer
-    arrival_stop_time: Schedule;    // uses ScheduleStopTimeSerializer
+    trip_ids: string[];
+    routes: string[];
+    legs: number; 
+    departure_stop_time: Schedule;  
+    arrival_stop_time: Schedule;   
 }
 
 export interface TripSearchResponse {
     matching_trips: MatchingTrip[];
+}
+
+export interface TripDetails {
+    trip_route_name: string;
+    trip_short_name: string;
+    plk_train_number: string;
+    trip_headsign: string | null;
+    routes: string[];
+    legs: number;
+    polylines: string[];
+    trip_stop_times: {
+        [trip_id: string]: StopTime[];
+    };
 }
