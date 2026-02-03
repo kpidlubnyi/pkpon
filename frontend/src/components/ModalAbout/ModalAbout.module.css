@@ -1,0 +1,142 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 991;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-backdrop.closing {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.modal-about {
+    background: var(--winter-gradient);
+    border-radius: 26px;
+    padding: 32px;
+    max-width: 500px;
+    position: relative;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: slideIn 0.3s ease-out forwards;
+    transform-origin: center;
+}
+
+.modal-about.closing {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.hero h1 {
+    font-family: var(--font-family);
+    font-size: 36px;
+    font-weight: var(--font-bold);
+    color: var(--primary-blue);
+}
+
+.pitch {
+    font-family: var(--font-family);
+    font-size: 18px;
+    font-weight: var(--font-medium);
+    color: #333;
+}
+
+.modal-about>p {
+    font-family: var(--font-family);
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.quick-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.quick-features span {
+    font-family: var(--font-family);
+    font-size: 13px;
+    background: #ffffffdf;
+    padding: 8px 16px;
+    border-radius: 16px;
+    box-shadow: var(--sm-shadow);
+}
+
+.close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--primary-blue);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+}
