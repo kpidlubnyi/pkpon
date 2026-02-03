@@ -1,9 +1,9 @@
 .route-results-container {
     position: absolute;
-    z-index: 999;
+    z-index: 990;
     top: 100px;
     left: 50px;
-    max-width: 412px;
+    width: 400px;
     max-height: 75vh;
     background: var(--winter-gradient);
     border-radius: 26px;

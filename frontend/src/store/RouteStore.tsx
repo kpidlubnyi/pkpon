@@ -16,7 +16,7 @@ interface RouteState {
   error: string | null;
   
   searchTrips: (params: TripSearchParams, fromStop: Stop, toStop: Stop) => Promise<void>;
-  selectTrip: (trip: MatchingTrip | null) => Promise<void>;
+  selectTrip: (trip: MatchingTrip | null) => void;
   clearTrips: () => void;
   setShowFullRoute: (show: boolean) => void;
 }
@@ -33,57 +33,75 @@ export const useRouteStore = create<RouteState>((set) => ({
   setShowFullRoute: (show) => set({ showFullRoute: show }),
   
   searchTrips: async (params: TripSearchParams, fromStop: Stop, toStop: Stop) => {
-    set({ isSearching: true, error: null });
-    try {
-      const res = await stopApi.searchTrips(params);
+  set({ isSearching: true, error: null });
+  try {
+    const res = await stopApi.searchTrips(params);
+    
+    if (res.matching_trips.length > 0) {
+      const detailsPromises = res.matching_trips.map(async (trip) => {
+        const firstTripId = trip.trip_ids[0];
+        try {
+          const details = await stopApi.getTripDetails(firstTripId);
+          return {
+            ...trip,
+            details: details,
+          };
+        } catch (error) {
+          console.error(`Error loading details for trip ${firstTripId}:`, error);
+          return {
+            ...trip,
+            details: null,
+          };
+        }
+      });
+
+      const tripsWithDetails = await Promise.all(detailsPromises);
       
       set({
-        matchingTrips: res.matching_trips,
+        matchingTrips: tripsWithDetails,
         searchParams: {
           from_stop: fromStop,
           to_stop: toStop,
         },
         isSearching: false,
+        tripDetails: null,
       });
-      console.log(res.matching_trips)
-      if (res.matching_trips.length === 0) {
-        toast.error('Nie znaleziono połączeń dla wybranych kryteriów');
-      } else {
-        toast.success(`Znaleziono ${res.matching_trips.length} połączeń`);
-      }
-    } catch (error) {
-      console.error('Error searching trips:', error);
-      toast.error('Nie udało się wyszukać połączeń');
-      set({ 
-        isSearching: false, 
-        error: 'Failed to search trips',
+      
+      toast.success(`Znaleziono ${tripsWithDetails.length} połączeń`);
+    } else {
+      set({
         matchingTrips: [],
+        searchParams: {
+          from_stop: fromStop,
+          to_stop: toStop,
+        },
+        isSearching: false,
+        tripDetails: null,
       });
+      toast.error('Nie znaleziono połączeń dla wybranych kryteriów');
     }
-  },
+  } catch (error) {
+    console.error('Error searching trips:', error);
+    toast.error('Nie udało się wyszukać połączeń');
+    set({ 
+      isSearching: false, 
+      error: 'Failed to search trips',
+      matchingTrips: [],
+    });
+  }
+},
 
-  selectTrip: async (trip) => {
-    if (!trip) {
-      set({ tripDetails: null });
-      return
-    }
-    const firstTripId = trip.trip_ids[0];
-    console.log(trip);
-      try {
-      const details = await stopApi.getTripDetails(firstTripId);
-      set({
-        tripDetails: details,
-        isDetailsLoading: false, 
-      })
-      console.log(details);
-    } catch (error) {
-      console.error('Error loading details for this trip', error);
-      set({
-        isDetailsLoading: false,
-        error: 'Failet to load details',
-      });
-    }
-  },
+selectTrip: (trip) => {
+  if (!trip) {
+    set({ tripDetails: null });
+    return;
+  }
+  
+  set({
+    tripDetails: trip.details || null,
+    isDetailsLoading: false,
+  });
+},
 
   clearTrips: () => {
     set({

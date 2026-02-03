@@ -87,6 +87,7 @@ export interface MatchingTrip {
     legs: number; 
     departure_stop_time: Schedule;  
     arrival_stop_time: Schedule;   
+    details?: TripDetails | null;
 }
 
 export interface TripSearchResponse {

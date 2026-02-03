@@ -9,11 +9,13 @@ import { useRouteStore } from '../../store/RouteStore';
 import dayjs from 'dayjs';
 import type { Stop } from '../../types';
 import { useStopsStore } from '../../store/StopsStore';
+import { ModalAbout } from '../ModalAbout/ModalAbout';
 
 export const SearchPanel = () => {
     const [active, setActive] = useState<'left' | 'right'>('right');
     const { searchTrips, clearTrips } = useRouteStore();
     const { clearSelectedSchedule } = useStopsStore();
+    const [showModal, setShowModal] = useState(false);
 
     const handleTripSearch = (from: Stop, to: Stop, date?: string, time?: string) => {
         const currTime = dayjs();
@@ -41,9 +43,13 @@ export const SearchPanel = () => {
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false)
+    };
+
     return (
         <div className={css["search-panel"]}>
-            <div className={css['logo-cont']}>
+            <div className={css['logo-cont']} onClick={() => setShowModal(true)}>
                 <LogoIcon className={css["logo"]} width={28} height={28} />
             </div>
             <div className={css["toggle-cont"]}>
@@ -76,6 +82,7 @@ export const SearchPanel = () => {
             ) : (
                 <Search />
             )}
+            {showModal && <ModalAbout closeModal={closeModal}/>}
         </div>
     );
 }

@@ -4,12 +4,14 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow: hidden;
 }
 
 .up-panel {
     display: flex;
     gap: 8px;
     align-items: flex-start;
+    flex-shrink: 0;
 }
 
 .header-section {
@@ -75,11 +77,20 @@
     transform: translateX(2px);
 }
 
+.stops-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
 .distance-section {
     display: flex;
     justify-content: space-between;
     margin-bottom: 4px;
     padding-right: 12px;
+    flex-shrink: 0;
 }
 
 .distance-value {
@@ -91,7 +102,10 @@
     background: var(--light-bg);
     padding: 16px;
     border-radius: 26px;
-    min-height: 200px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .time-platform {
@@ -99,6 +113,7 @@
     flex-direction: column;
     gap: 4px;
     margin-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .dep-stop {
@@ -122,17 +137,20 @@
     display: flex;
     gap: 8px;
 }
+
 .badged {
     background-color: #d5d5d5;
     color: #000000;
     border-radius: 5px;
     padding: 0 4px;
 }
+
 .route-info {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .carrier-badge {
@@ -163,13 +181,16 @@
     color: #666666;
     font-weight: var(--font-medium);
     margin-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .stops-list {
     list-style: none;
-    max-height: 270px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
+
 .stop-item {
     display: flex;
     gap: 12px;
@@ -193,10 +214,71 @@
 }
 
 .transfers-section {
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    max-height: 35%;
+    overflow-y: auto;
 }
 
 .transfers-list {
     margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transfer-item {
+    background: var(--light-bg);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.transfer-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.transfer-station {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: 
+    space-between;
+    font-size: 16px;
+    font-weight: var(--font-bold);
+}
+
+.transfer-platform-info {
+    font-size: 12px;
+    color: #666666;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.transfer-route-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transfer-destination {
+    font-size: 13px;
+    font-weight: var(--font-medium);
+    color: #000000;
+}
+
+.transfer-times {
+    display: flex;
+    font-size: 13px;
+    color: #666666;
+}
+
+.transfer-waiting {
+    font-size: 13px;
+    color: #666666;
+    font-weight: var(--font-medium);
 }

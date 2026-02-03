@@ -1,11 +1,14 @@
-import { useMemo } from 'react';
-import { Polyline } from 'react-leaflet';
+import { useEffect, useMemo } from 'react';
+import { Polyline, useMap } from 'react-leaflet';
 import { useRouteStore } from '../../store/RouteStore';
 import polyline from '@mapbox/polyline';
+import { getRelevantPolylines } from '../../utils/tripUtils';
+import L from 'leaflet';
 
 const SEGMENT_COLORS = ['#3a62ff', '#ff5719', '#a323ff', '#ff006e', '#8338ec'];
 
 export const TripPolyline = () => {
+  const map = useMap();
   const { tripDetails, searchParams, showFullRoute } = useRouteStore();
 
   const segments = useMemo<Array<{ positions: [number, number][]; color: string }>>(() => {
@@ -13,7 +16,7 @@ export const TripPolyline = () => {
       return [];
     }
 
- if (showFullRoute) {
+    if (showFullRoute) {
       return tripDetails.polylines.map((encodedPolyline, index) => {
         const allPositions = polyline.decode(encodedPolyline);
         return {
@@ -23,16 +26,19 @@ export const TripPolyline = () => {
       });
     }
 
-    if (!searchParams) {
-      return [];
-    }
-
     const fromStopId = searchParams.from_stop?.stop_id;
     const toStopId = searchParams.to_stop?.stop_id;
 
     if (!fromStopId || !toStopId) {
       return [];
     }
+
+    const relevantPolylines = getRelevantPolylines(
+      tripDetails.trip_stop_times,
+      tripDetails.polylines,
+      fromStopId,
+      toStopId
+    );
 
     const trimPolylineForTrip = (
       encodedPolyline: string,
@@ -101,8 +107,30 @@ export const TripPolyline = () => {
       );
     };
 
-    const segments = tripDetails.polylines.map((encodedPolyline, index) => {
-      const tripId = Object.keys(tripDetails.trip_stop_times)[index];
+    const tripIds = Object.keys(tripDetails.trip_stop_times);
+    let foundStart = false;
+    const relevantTripIds: string[] = [];
+
+    for (const tripId of tripIds) {
+      const stops = tripDetails.trip_stop_times[tripId];
+      const hasFromStop = stops.some(stop => stop.stop.stop_id === fromStopId);
+      const hasToStop = stops.some(stop => stop.stop.stop_id === toStopId);
+
+      if (hasFromStop) {
+        foundStart = true;
+      }
+
+      if (foundStart) {
+        relevantTripIds.push(tripId);
+      }
+
+      if (hasToStop) {
+        break;
+      }
+    }
+
+    const segments = relevantPolylines.map((encodedPolyline, index) => {
+      const tripId = relevantTripIds[index];
       const trimmedPositions = trimPolylineForTrip(
         encodedPolyline,
         tripId,
@@ -118,11 +146,35 @@ export const TripPolyline = () => {
 
     return segments;
   }, [tripDetails, searchParams, showFullRoute]);
+  
+  useEffect(() => {
+    if (segments.length === 0) {
+      return;
+    }
+
+    const allPoints: [number, number][] = segments.flatMap(segment => segment.positions);
+
+    if (allPoints.length === 0) {
+      return;
+    }
+
+    const bounds = L.latLngBounds(allPoints);
+
+    map.fitBounds(bounds, {
+      padding: [50, 50],
+      animate: true,
+      duration: 0.8,
+      maxZoom: 10,
+    });
+  }, [segments, map]);
+  
+ 
 
   if (segments.length === 0) {
     return null;
   }
 
+  
   return (
     <>
       {segments.map((segment, index) => (
