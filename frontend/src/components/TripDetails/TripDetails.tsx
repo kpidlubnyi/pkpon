@@ -5,7 +5,7 @@ import {
   removeDuplicateTransferStops,
   flattenTripStops,
   extractTransfers
-} from '../../utils/TripUtils';
+} from '../../utils/tripUtils';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import BackIcon from "../../assets/icons/icon-back.svg?react"
 import { useMemo } from "react";
@@ -39,7 +39,7 @@ export const TripDetails = () => {
 
       const cleanedStops = removeDuplicateTransferStops(userStops);
 
-      return cleanedStops.slice(1); // Пропускаємо першу зупинку
+      return cleanedStops.slice(1); 
     }, [details, searchParams]); 
 
     const fullRouteStops = useMemo(() => {

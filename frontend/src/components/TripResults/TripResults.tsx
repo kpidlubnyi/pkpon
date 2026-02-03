@@ -5,7 +5,7 @@ import { Loading } from '../Loading/Loading';
 import type { MatchingTrip } from '../../types';
 import dayjs from 'dayjs';
 import { TripDetails } from '../TripDetails/TripDetails';
-import { calculateUserTransfers } from '../../utils/TripUtils';
+import { calculateUserTransfers } from '../../utils/tripUtils';
 
 export const TripResults = () => {
   const { matchingTrips, selectTrip, isSearching, tripDetails, searchParams } =
