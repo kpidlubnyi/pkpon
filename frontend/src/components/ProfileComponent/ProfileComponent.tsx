@@ -21,7 +21,7 @@ export const ProfileComponent = ({ user, onLogout }: ProfileComponentProps) => {
                     <p className={css['username-content']}>{user.email}</p>
                 </div>
                 <div className={css['logout']} onClick={onLogout}>
-                    <button className={css['logout-btn']} >
+                    <button className={css['logout-btn']}>
                         <LogoutIcon className={css['logout-icon']} />
                     </button>
                 </div>

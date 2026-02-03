@@ -5,6 +5,7 @@ import { useUserStore } from "../../store/UserStore";
 import { AuthComponent } from "../AuthComponent/AuthComponent";
 import { ProfileComponent } from "../ProfileComponent/ProfileComponent";
 import { CSSTransition } from "react-transition-group";
+import toast from "react-hot-toast";
 
 type PanelMode = 'auth' | 'profile' | null;
 
@@ -21,10 +22,34 @@ export const UserProfileComp = () => {
         setPanelMode(prev => prev ? null : user ? 'profile' : 'auth');
     }
 
-    const handleLogout = async () => {
-        await logout();
-        setPanelMode('auth');
-    };
+   const handleLogout = () => {
+       toast((t) => (
+        <span className={css['confirm-toast']}>
+            Czy na pewno chcesz się wylogować?
+            <div className={css['toast-buttons']} >
+                <button onClick={() => { 
+                    toast.dismiss(t.id); 
+                    void logout(); 
+                    setPanelMode('auth'); 
+                }}
+                className={css['confirm-btn']}>
+                    Tak
+                </button>
+                <button className={css['confirm-btn']} onClick={() => { toast.dismiss(t.id); setPanelMode('profile')}}>Nie</button>
+            </div>
+        </span>
+       ), {
+           duration: Infinity,
+           position: 'top-center',
+           style: {
+               background: 'linear-gradient(to left, #8db1ccdd, #e2e9eadd)',      
+               color: '#000000',              
+               borderRadius: '26px',  
+               padding: '10px',           
+               boxShadow: 'var(--shadow)'
+           }
+    });
+};
 
     useEffect(() => {
         const loginAndClose = () => {
