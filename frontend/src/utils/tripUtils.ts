@@ -6,6 +6,7 @@ export interface StopWithTripId {
   departure_time: string;
   tripId: string;
   stop_sequence: number;
+  fare_dist_m: number;
 }
 
 export function flattenTripStops(
@@ -18,7 +19,8 @@ export function flattenTripStops(
         arrival_time: stop.arrival_time,
         departure_time: stop.departure_time,
         tripId,
-        stop_sequence: stop.stop_sequence
+        stop_sequence: stop.stop_sequence,
+        fare_dist_m: stop.fare_dist_m,
       }))
     )
     .sort((a, b) => a.stop_sequence - b.stop_sequence);
@@ -121,4 +123,30 @@ export function getRelevantPolylines(
   }
 
   return relevantPolylines;
+}
+
+export function calculateTripDistance(
+  stops: StopWithTripId[]
+): number {
+  if (stops.length === 0) {
+    return 0;
+  }
+
+  let cummDist = 0;
+  let startDist = stops[0].fare_dist_m;
+  let currDist = startDist;
+
+  for (const s of stops) {
+    if (s.fare_dist_m >= currDist) {
+      currDist = s.fare_dist_m;
+    } else {
+      cummDist += currDist - startDist;
+      startDist = 0;
+      currDist = s.fare_dist_m;
+    }
+  }
+  
+  cummDist += currDist - startDist;
+
+  return (cummDist / 1000).toFixed(1);
 }

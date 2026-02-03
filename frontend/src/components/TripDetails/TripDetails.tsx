@@ -4,7 +4,8 @@ import {
   getUserJourneyStops, 
   removeDuplicateTransferStops,
   flattenTripStops,
-  calculateUserTransfers
+  calculateUserTransfers,
+  calculateTripDistance
 } from '../../utils/tripUtils';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import BackIcon from "../../assets/icons/icon-back.svg?react"
@@ -14,15 +15,6 @@ import { normalizeTime } from "../../utils/FormatTime";
 
 export const TripDetails = () => {
     const { tripDetails: details, searchParams, selectTrip, showFullRoute, setShowFullRoute } = useRouteStore();
-    
-    const totalDist = details?.trip_stop_times
-        ? Object.values(details.trip_stop_times).reduce(
-            (sum, stops) => sum + (stops[stops.length - 1]?.fare_dist_m ?? 0),
-            0
-        )
-        : 0;
-
-    const totalKm = (totalDist / 1000).toFixed(1);
     
     const routeStops = useMemo(() => {
       if (!details?.trip_stop_times || !searchParams?.from_stop || !searchParams.to_stop) {
@@ -50,10 +42,35 @@ export const TripDetails = () => {
 
       const allStops = flattenTripStops(details.trip_stop_times);
       const cleanedStops = removeDuplicateTransferStops(allStops);
-
       return cleanedStops.slice(1);
     }, [details]);
 
+    const userTotalKm = (() => {
+      if (!details?.trip_stop_times || !searchParams?.from_stop || !searchParams.to_stop) {
+        return 0;
+      }
+
+    const fromStopId = searchParams.from_stop.stop_id;
+    const toStopId = searchParams.to_stop.stop_id;
+    
+    const userStops = getUserJourneyStops(
+      details.trip_stop_times,
+      fromStopId,
+      toStopId
+    );
+    
+    return calculateTripDistance(userStops);
+    })();
+
+    const fullTotalKm = (() => {
+      if (!details?.trip_stop_times) {
+        return 0;
+      }
+
+    const allStops = flattenTripStops(details.trip_stop_times);
+    return calculateTripDistance(allStops);
+    })();
+    
     const userTransferCount = useMemo(() => {
       if (!details?.trip_stop_times || !searchParams?.from_stop || !searchParams.to_stop) {
         return 0;
@@ -172,7 +189,7 @@ export const TripDetails = () => {
             <div className={css['stops-section']}>
                 <div className={css['distance-section']}>
                     <p className={css['label']}>Trasa</p>
-                    <p className={css['distance-value']}>{totalKm} km</p>
+                    <p className={css['distance-value']}>{showFullRoute ? fullTotalKm : userTotalKm} km</p>
                 </div>
                 {departureStop && (
                     <div className={css['stops']}>
