@@ -91,9 +91,12 @@ def find_matching_trips(from_stop:str, to_stop:str, date_:date, time_:time) -> d
 
         mt_ids = [tr.id for tr in matching_trips]
 
-        set_cached_user_trip_ids_search(
-            from_stop, to_stop, date_str, 
-            from_time_str, to_time_str, mt_ids
-        )
+        try:
+            set_cached_user_trip_ids_search(
+                from_stop, to_stop, date_str, 
+                from_time_str, to_time_str, mt_ids
+            )
+        except:
+            pass
 
     return matching_trips
