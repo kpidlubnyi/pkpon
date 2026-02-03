@@ -4,12 +4,11 @@ import {
   getUserJourneyStops, 
   removeDuplicateTransferStops,
   flattenTripStops,
-  calculateUserTransfers
-} from '../../utils/tripUtils';
+  extractTransfers
+} from '../../utils/TripUtils';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import BackIcon from "../../assets/icons/icon-back.svg?react"
 import { useMemo } from "react";
-import type { Stop } from "../../types";
 import { normalizeTime } from "../../utils/FormatTime";
 
 export const TripDetails = () => {
@@ -40,7 +39,7 @@ export const TripDetails = () => {
 
       const cleanedStops = removeDuplicateTransferStops(userStops);
 
-      return cleanedStops.slice(1);
+      return cleanedStops.slice(1); // Пропускаємо першу зупинку
     }, [details, searchParams]); 
 
     const fullRouteStops = useMemo(() => {
@@ -51,84 +50,32 @@ export const TripDetails = () => {
       const allStops = flattenTripStops(details.trip_stop_times);
       const cleanedStops = removeDuplicateTransferStops(allStops);
 
-      return cleanedStops.slice(1);
+      return cleanedStops.slice(1); 
     }, [details]);
 
-    const userTransferCount = useMemo(() => {
+
+    const userTransferStations = useMemo(() => {
       if (!details?.trip_stop_times || !searchParams?.from_stop || !searchParams.to_stop) {
-        return 0;
+        return [];
       }
 
-      return calculateUserTransfers(
+      const userStops = getUserJourneyStops(
         details.trip_stop_times,
         searchParams.from_stop.stop_id,
         searchParams.to_stop.stop_id
       );
+
+      return extractTransfers(userStops, details);
     }, [details, searchParams]);
 
-    const transferStations = useMemo(() => {
-  if (!details?.trip_stop_times || !searchParams?.from_stop || !searchParams.to_stop) {
-    return [];
-  }
+    const fullRouteTransferStations = useMemo(() => {
+      if (!details?.trip_stop_times) {
+        return [];
+      }
 
-  const userStops = getUserJourneyStops(
-    details.trip_stop_times,
-    searchParams.from_stop.stop_id,
-    searchParams.to_stop.stop_id
-  );
-
-  const transfers: Array<{
-    station: Stop;
-    arrivalTime: string;
-    departureTime: string;
-    waitingMinutes: number;
-    departureRoute: string;
-    departurePlatform: string | null;
-    departureTrack: string | null;
-    tripHeadsign: string | null;
-  }> = [];
-
-  for (let i = 0; i < userStops.length - 1; i++) {
-    const current = userStops[i];
-    const next = userStops[i + 1];
-
-    if (current.stop.stop_id === next.stop.stop_id && current.tripId !== next.tripId) {
-      const arrivalTime = current.arrival_time;
-      const departureTime = next.departure_time;
-
-      const [arrHours, arrMinutes] = arrivalTime.split(':').map(Number);
-      const [depHours, depMinutes] = departureTime.split(':').map(Number);
-      const waitingMinutes = (depHours * 60 + depMinutes) - (arrHours * 60 + arrMinutes);
-
-      const nextTripStops = details.trip_stop_times[next.tripId];
-      const departureStopDetails = nextTripStops?.find(
-        stop => stop.stop.stop_id === next.stop.stop_id
-      );
-
-      const nextTripRoute = details.routes?.find((_, index) => {
-        const tripIds = Object.keys(details.trip_stop_times);
-        return tripIds[index] === next.tripId;
-      }) || details.routes[0];
-
-      transfers.push({
-        station: current.stop,
-        arrivalTime,
-        departureTime,
-        waitingMinutes,
-        departureRoute: nextTripRoute,
-        departurePlatform: departureStopDetails?.platform != null 
-          ? String(departureStopDetails.platform) 
-          : null,
-        departureTrack: departureStopDetails?.track != null 
-          ? String(departureStopDetails.track) 
-          : null,
-        tripHeadsign: details.trip_headsign,
-      });
-    }
-  }
-
-  return transfers;
-}, [details, searchParams]);
+      const allStops = flattenTripStops(details.trip_stop_times);
+      return extractTransfers(allStops, details);
+    }, [details]);
 
     if (!details || !searchParams) return null;
 
@@ -154,6 +101,8 @@ export const TripDetails = () => {
     };
     
     const displayStops = showFullRoute ? fullRouteStops : routeStops;
+    const displayTransfers = showFullRoute ? fullRouteTransferStations : userTransferStations;
+    const displayTransferCount = displayTransfers.length;
    
     return (
         <div className={css['trip-details-container']}>
@@ -209,6 +158,32 @@ export const TripDetails = () => {
                         <ul className={css['stops-list']}>
                             {displayStops.map((stop, index) => {
                                 const time = normalizeTime(stop.arrival_time.slice(0, 5));
+                                const isLast = index === displayStops.length - 1;
+                                
+                                if (isLast) {
+                                    return (
+                                        <li key={`${stop.tripId}-${index}`} className={css['time-platform']}>
+                                            <div className={css['stop-info']}>
+                                                <span className={css['departure-time']}>
+                                                    {time.time}
+                                                </span>
+                                                <span className={css['station-name']}>
+                                                    {stop.stop.stop_name}
+                                                </span>
+                                            </div>
+                                            <div className={css['platform-info']}>
+                                                przyjazd na:
+                                                <span className={css['badged']}>
+                                                    peron {stop.platform || '-'}
+                                                </span>
+                                                <span className={css['badged']}>
+                                                    tor {stop.track || '-'}
+                                                </span>
+                                            </div>
+                                        </li>
+                                    );
+                                }
+                                
                                 return (
                                     <li key={`${stop.tripId}-${index}`} className={css['stop-item']}>
                                         <span className={css['stop-time']}>
@@ -225,13 +200,13 @@ export const TripDetails = () => {
                 )}
             </div>
 
-            {!showFullRoute && userTransferCount > 0 && (
+            {displayTransferCount > 0 && (
                 <div className={css['transfers-section']}>
                     <p className={css['label']}>
-                        Przesiadki ({userTransferCount})
+                        Przesiadki ({displayTransferCount})
                     </p>
                     <div className={css['transfers-list']}>
-                        {transferStations.map((transfer, index) => (
+                        {displayTransfers.map((transfer, index) => (
                             <div key={index} className={css['transfer-item']}>
                                 <div className={css['transfer-header']}>
                                     <span className={css['transfer-station']}>
