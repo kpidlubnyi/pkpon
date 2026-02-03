@@ -23,7 +23,7 @@ export const Map = () => {
         zoomControl={false}
         scrollWheelZoom
         center={[52.049, 19.204]}
-        zoom={6.4}
+        zoom={7}
         style={{ height: "100vh", width: "100%" }}
       >
         <TileLayer
