@@ -120,14 +120,18 @@
     display: flex;
     gap: 8px;
 }
-
+.stop-info {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
 .departure-time {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: var(--font-bold);
 }
 
 .station-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: var(--font-regular);
 }
 
@@ -154,13 +158,13 @@
 }
 
 .carrier-badge {
-    background: #000000;
-    color: #ffffff;
-    padding: 4px 12px;
+    background:  var(--primary-blue);
+    color: #fff;
+    padding: 4px 8px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: var(--font-bold);
-    min-width: 40px;
+    min-width: 30px;
     text-align: center;
 }
 
@@ -171,17 +175,16 @@
 }
 
 .final-destination {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: var(--font-medium);
     color: #000000;
 }
 
 .train-number {
-    font-size: 13px;
+    font-size: 12px;
     color: #666666;
     font-weight: var(--font-medium);
-    margin-bottom: 8px;
-    flex-shrink: 0;
+    margin-bottom: 4px;
 }
 
 .stops-list {
@@ -221,18 +224,26 @@
 
 .transfers-list {
     margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    background: var(--light-bg);
+    border-radius: 26px;
+    padding: 12px;
 }
 
 .transfer-item {
-    background: var(--light-bg);
-    padding: 12px;
-    border-radius: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.transfer-item:first-child {
+    padding-top: 0;
+}
+
+.transfer-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .transfer-header {
@@ -245,8 +256,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    justify-content: 
-    space-between;
+    justify-content: space-between;
     font-size: 16px;
     font-weight: var(--font-bold);
 }
@@ -266,7 +276,7 @@
 }
 
 .transfer-destination {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: var(--font-medium);
     color: #000000;
 }
@@ -275,10 +285,4 @@
     display: flex;
     font-size: 13px;
     color: #666666;
-}
-
-.transfer-waiting {
-    font-size: 13px;
-    color: #666666;
-    font-weight: var(--font-medium);
 }

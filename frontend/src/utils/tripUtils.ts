@@ -1,4 +1,4 @@
-import type { Stop, StopTime } from '../types';
+import type { Stop, StopTime, TripDetails } from '../types';
 
 export interface StopWithTripId {
   stop: Stop;
@@ -6,6 +6,19 @@ export interface StopWithTripId {
   departure_time: string;
   tripId: string;
   stop_sequence: number;
+  platform: number | null;
+  track: number | null;
+  fare_dist_m: number;
+}
+
+export interface TransferInfo {
+  station: Stop;
+  arrivalTime: string;
+  departureTime: string;
+  departureRoute: string;
+  departurePlatform: string | null;
+  departureTrack: string | null;
+  tripHeadsign: string | null;
 }
 
 export function flattenTripStops(
@@ -18,11 +31,14 @@ export function flattenTripStops(
         arrival_time: stop.arrival_time,
         departure_time: stop.departure_time,
         tripId,
-        stop_sequence: stop.stop_sequence
+        stop_sequence: stop.stop_sequence,
+        platform: stop.platform ?? null,
+        track: stop.track ?? null,
+        fare_dist_m: stop.fare_dist_m,
       }))
     )
     .sort((a, b) => a.stop_sequence - b.stop_sequence);
-}
+};
 
 export function getUserJourneyStops(
   tripStopTimes: Record<string, StopTime[]>,
@@ -121,4 +137,73 @@ export function getRelevantPolylines(
   }
 
   return relevantPolylines;
+}
+
+export function extractTransfers(
+  stops: StopWithTripId[],
+  details: TripDetails
+): TransferInfo[] {
+  const transfers: TransferInfo[] = [];
+
+  for (let i = 0; i < stops.length - 1; i++) {
+    const current = stops[i];
+    const next = stops[i + 1];
+
+    if (current.stop.stop_id === next.stop.stop_id && current.tripId !== next.tripId) {
+      const arrivalTime = current.arrival_time;
+      const departureTime = next.departure_time;
+
+      const nextTripStops = details.trip_stop_times[next.tripId];
+      const departureStopDetails = nextTripStops?.find(
+        stop => stop.stop.stop_id === next.stop.stop_id
+      );
+
+      const nextTripRoute = details.routes?.find((_, index) => {
+        const tripIds = Object.keys(details.trip_stop_times);
+        return tripIds[index] === next.tripId;
+      }) || details.routes[0];
+
+      transfers.push({
+        station: current.stop,
+        arrivalTime,
+        departureTime,
+        departureRoute: nextTripRoute,
+        departurePlatform: departureStopDetails?.platform != null 
+          ? String(departureStopDetails.platform) 
+          : null,
+        departureTrack: departureStopDetails?.track != null 
+          ? String(departureStopDetails.track) 
+          : null,
+        tripHeadsign: details.trip_headsign,
+      });
+    }
+  }
+
+  return transfers;
+}
+
+export function calculateTripDistance(
+  stops: StopWithTripId[]
+): string {
+  if (stops.length === 0) {
+    return '0';
+  }
+
+  let cummDist = 0;
+  let startDist = stops[0].fare_dist_m;
+  let currDist = startDist;
+
+  for (const s of stops) {
+    if (s.fare_dist_m >= currDist) {
+      currDist = s.fare_dist_m;
+    } else {
+      cummDist += currDist - startDist;
+      startDist = 0;
+      currDist = s.fare_dist_m;
+    }
+  }
+  
+  cummDist += currDist - startDist;
+
+  return (cummDist / 1000).toFixed(1);
 }

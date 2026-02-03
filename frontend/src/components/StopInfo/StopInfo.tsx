@@ -51,9 +51,9 @@ export const StopInfo = () => {
           <CloseIcon className={css['close']} onClick={clearSelectedSchedule} width={30} height={30}/>
             <div className={css['stop-name-cont']}>
                 <h2 className={css['stop-name']}>{selectedStop?.stop_name}</h2>
-                <div className={css["isochrone-icon"]}>
-                    <IsoChrone width={30} height={30} />
-                </div>
+                <div className={css["isochrone-icon"]} data-tooltip="Mapa izochroniczna nie jest jeszcze dostępna, prosimy o cierpliwość :)">
+    <IsoChrone width={30} height={30} />
+</div>
             </div>
             <div className={css['main-cont']}>
                 <div className={css['settings']}>
