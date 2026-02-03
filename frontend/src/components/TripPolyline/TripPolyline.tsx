@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { Polyline, useMap } from 'react-leaflet';
 import { useRouteStore } from '../../store/RouteStore';
 import polyline from '@mapbox/polyline';
-import { getRelevantPolylines } from '../../utils/TripUtils';
+import { getRelevantPolylines } from '../../utils/tripUtils';
 import L from 'leaflet';
 
 const SEGMENT_COLORS = ['#3a62ff', '#ff5719', '#a323ff', '#ff006e', '#8338ec'];

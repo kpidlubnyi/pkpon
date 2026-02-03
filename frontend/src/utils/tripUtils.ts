@@ -8,6 +8,7 @@ export interface StopWithTripId {
   stop_sequence: number;
   platform: number | null;
   track: number | null;
+  fare_dist_m: number;
 }
 
 export interface TransferInfo {
@@ -33,6 +34,7 @@ export function flattenTripStops(
         stop_sequence: stop.stop_sequence,
         platform: stop.platform ?? null,
         track: stop.track ?? null,
+        fare_dist_m: stop.fare_dist_m,
       }))
     )
     .sort((a, b) => a.stop_sequence - b.stop_sequence);
@@ -178,4 +180,30 @@ export function extractTransfers(
   }
 
   return transfers;
+}
+
+export function calculateTripDistance(
+  stops: StopWithTripId[]
+): string {
+  if (stops.length === 0) {
+    return '0';
+  }
+
+  let cummDist = 0;
+  let startDist = stops[0].fare_dist_m;
+  let currDist = startDist;
+
+  for (const s of stops) {
+    if (s.fare_dist_m >= currDist) {
+      currDist = s.fare_dist_m;
+    } else {
+      cummDist += currDist - startDist;
+      startDist = 0;
+      currDist = s.fare_dist_m;
+    }
+  }
+  
+  cummDist += currDist - startDist;
+
+  return (cummDist / 1000).toFixed(1);
 }
