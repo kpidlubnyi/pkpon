@@ -77,7 +77,7 @@ export interface StopTime {
     departure_time: string;
     platform?: number;
     track?: number;
-    fare_dist_m?: number;
+    fare_dist_m: number;
     vehicle_kind: string;
 }
 
