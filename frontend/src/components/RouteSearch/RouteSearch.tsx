@@ -7,6 +7,7 @@ import SwapIcon from '../../assets/icons/swap.svg?react';
 import CalenderIcon from '../../assets/icons/calender.svg?react';
 import { DatePickerComponent, type DatePickerRef } from "../DatePicker/DatePicker";
 import { parseDateTimeString } from "../../utils/DateTimeParser";
+import { useSearchHistory } from "../../hooks/useSearchHistory";
 
 interface RouteSearchProps {
   onRouteSearch?: (from: Stop, to: Stop, date?: string, time?: string) => void;
@@ -23,6 +24,9 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
   const [toValue, setToValue] = useState<Stop | null>(null);
 
   const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
+
+  const fromHistory = useSearchHistory('from');
+  const toHistory = useSearchHistory('to');
 
   const handleSearch = () => {
     if (fromValue && toValue) {
@@ -49,28 +53,52 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
     setSelectedDateTime(dateTime);
   };
 
+  const getFilteredOptions = (
+    inputValue: string,
+    history: Stop[],
+    allStops: Stop[]
+  ): Stop[] => {
+    if (inputValue.length === 0) {
+      return history;
+    }
+    
+    const filtered = allStops.filter(stop =>
+      stop.stop_name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    
+    return filtered;
+  };
+
   return (
     <div className={css['route-search-container']}>
       <Autocomplete<Stop>
         value={fromValue}
         options={stops}
         disablePortal
-        openOnFocus={false}
+        openOnFocus={true}
         inputValue={fromInputValue}
         onInputChange={(_, value) => setFromInputValue(value)}
         getOptionLabel={(option) =>
           typeof option === 'string' ? option : option.stop_name
         }
-        filterOptions={(options) =>
-          fromInputValue.length === 0
-            ? []
-            : options.filter(o =>
-              o.stop_name.toLowerCase().includes(fromInputValue.toLowerCase())
-            )
+        filterOptions={() => 
+          getFilteredOptions(fromInputValue, fromHistory.history, stops)
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
           setFromValue(newValue);
+          if (newValue) {
+            fromHistory.addToHistory(newValue);
+          }
+        }}
+        groupBy={(option) => {
+          if (fromInputValue.length === 0 && fromHistory.history.length > 0) {
+            const isInHistory = fromHistory.history.some(
+              h => h.stop_id === option.stop_id
+            );
+            return isInHistory ? 'Ostatnie' : '';
+          }
+          return '';
         }}
         sx={{
           height: 45,
@@ -116,10 +144,22 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                   display: 'none',
                 },
               },
+              '& .MuiAutocomplete-groupLabel': {
+                fontFamily: 'var(--font-family)',
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#666',
+                backgroundColor: '#eeeeee',
+                position: 'sticky',
+                top: 0,
+                px: 2,
+                py: 0.3,
+                lineHeight: 1.4,
+              },
               '& .MuiAutocomplete-option': {
                 fontFamily: 'var(--font-family)',
                 backgroundColor: '#c8c8c8c0',
-                borderRadius: 4,
+                borderRadius: 6,
                 mx: 1,
                 my: 0.5,
                 px: 2,
@@ -160,7 +200,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
       <button
         className={css['swap-button']}
         onClick={handleSwap}
-        aria-label="Zamień miejscami"
+        aria-label="switch"
         disabled={!fromValue && !toValue}
       >
         <SwapIcon width={16} height={16} />
@@ -170,22 +210,30 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
         value={toValue}
         options={stops}
         disablePortal
-        openOnFocus={false}
+        openOnFocus={true}
         inputValue={toInputValue}
         onInputChange={(_, value) => setToInputValue(value)}
         getOptionLabel={(option) =>
           typeof option === 'string' ? option : option.stop_name
         }
-        filterOptions={(options) =>
-          toInputValue.length === 0
-            ? []
-            : options.filter(o =>
-              o.stop_name.toLowerCase().includes(toInputValue.toLowerCase())
-            )
+        filterOptions={() => 
+          getFilteredOptions(toInputValue, toHistory.history, stops)
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
           setToValue(newValue);
+          if (newValue) {
+            toHistory.addToHistory(newValue);
+          }
+        }}
+        groupBy={(option) => {
+          if (toInputValue.length === 0 && toHistory.history.length > 0) {
+            const isInHistory = toHistory.history.some(
+              h => h.stop_id === option.stop_id
+            );
+            return isInHistory ? 'Ostatnie' : '';
+          }
+          return '';
         }}
         sx={{
           height: 45,
@@ -231,10 +279,22 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
                   display: 'none',
                 },
               },
+              '& .MuiAutocomplete-groupLabel': {
+                fontFamily: 'var(--font-family)',
+                fontSize: 11,
+                fontWeight: 600,
+                color: '#666',
+                backgroundColor: '#eeeeee',
+                position: 'sticky',
+                top: 0,
+                px: 2,
+                py: 0.3,
+                lineHeight: 1.4, 
+              },
               '& .MuiAutocomplete-option': {
                 fontFamily: 'var(--font-family)',
                 backgroundColor: '#c8c8c8c0',
-                borderRadius: 4,
+                borderRadius: 6,
                 mx: 1,
                 my: 0.5,
                 px: 2,
