@@ -57,8 +57,8 @@ def check_gtfs_update():
         logger.info("Backing up production tables to staging...")
         backup_from_common_tables()
 
-        logger.info("GTFS import task completed successfully. Calling the isochrone creating task...")
-        create_isochrone_cache.delay()
+        logger.info("GTFS import task completed successfully.") #Calling the isochrone creating task...")
+        #create_isochrone_cache.delay()
         return {"status": "ok", "sha": feed.sha}
 
     except Exception as e:
