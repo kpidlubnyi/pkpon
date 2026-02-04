@@ -164,7 +164,7 @@
     gap: 8px;
     font-family: var(--font-family);
     width: 100%;
-    background-color: #edededcd;
+    background-color: var(--light-bg);
     border-radius: 26px;
     height: 40px;
     padding: 4px;

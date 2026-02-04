@@ -78,7 +78,7 @@ export const StopInfo = () => {
                                 Przyjazdy
                             </button>
                         </div>
-                        <div style={{ position: "absolute", bottom: 30, left: 320 }}>
+                        <div style={{ position: "absolute", bottom: 40, left: 370 }}>
                             <DatePickerComponent
                                 ref={datePickerRef}
                                 onDateTimeChange={handleDateTimeChange}

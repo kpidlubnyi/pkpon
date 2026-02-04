@@ -6,9 +6,10 @@ import type { MatchingTrip } from '../../types';
 import dayjs from 'dayjs';
 import { TripDetails } from '../TripDetails/TripDetails';
 import { calculateUserTransfers } from '../../utils/tripUtils';
+import CloseIcon from '../../assets/icons/close.svg?react';
 
 export const TripResults = () => {
-  const { matchingTrips, selectTrip, isSearching, tripDetails, searchParams } =
+  const { matchingTrips, selectTrip, isSearching, tripDetails, searchParams, clearTrips } =
     useRouteStore();
   const currTime = dayjs();
   const date = currTime.format('DD.MM.YYYY');
@@ -57,6 +58,7 @@ export const TripResults = () => {
 
   return (
     <div className={css['route-results-container']}>
+      <CloseIcon className={css['close']} onClick={clearTrips} width={24} height={24} />
       <div className={css['route-header']}>
         <div className={css['route-info']}>
           <h3 className={css['route-title']}>
