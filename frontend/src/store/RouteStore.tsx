@@ -9,6 +9,8 @@ interface RouteState {
   searchParams: {
     from_stop: Stop | null;
     to_stop: Stop | null;
+    time: string | undefined;
+    date: string | undefined;
   } | null;
   isSearching: boolean;
   isDetailsLoading: boolean;
@@ -62,6 +64,8 @@ export const useRouteStore = create<RouteState>((set) => ({
         searchParams: {
           from_stop: fromStop,
           to_stop: toStop,
+          date: params.date,
+          time: params.time,
         },
         isSearching: false,
         tripDetails: null,
@@ -74,6 +78,8 @@ export const useRouteStore = create<RouteState>((set) => ({
         searchParams: {
           from_stop: fromStop,
           to_stop: toStop,
+          date: params.date,
+          time: params.time,
         },
         isSearching: false,
         tripDetails: null,

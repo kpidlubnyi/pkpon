@@ -3,7 +3,6 @@ import { normalizeTime } from '../../utils/FormatTime';
 import css from './TripResults.module.css';
 import { Loading } from '../Loading/Loading';
 import type { MatchingTrip } from '../../types';
-import dayjs from 'dayjs';
 import { TripDetails } from '../TripDetails/TripDetails';
 import { calculateUserTransfers } from '../../utils/tripUtils';
 import CloseIcon from '../../assets/icons/close.svg?react';
@@ -11,9 +10,8 @@ import CloseIcon from '../../assets/icons/close.svg?react';
 export const TripResults = () => {
   const { matchingTrips, selectTrip, isSearching, tripDetails, searchParams, clearTrips } =
     useRouteStore();
-  const currTime = dayjs();
-  const date = currTime.format('DD.MM.YYYY');
-  const time = currTime.format('HH:mm');
+  const date = searchParams?.date;
+  const time = searchParams?.time?.slice(0, 5);
 
   if (!searchParams) return null;
 
