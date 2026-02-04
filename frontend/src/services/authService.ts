@@ -2,7 +2,7 @@ import axios from "axios";
 import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import type { AuthResponse, LoginData, LogoutResponse, RegisterData, UserProfileResponse } from "../types";
 
-export const backendUrl = import.meta.env.VITE_BACKEND_URL
+export const backendUrl = '/api/'
 
 export const api: AxiosInstance = axios.create({
     baseURL: backendUrl,

@@ -9,8 +9,6 @@ services:
       - ./backend/core:/back
       - logs_volume:/back/logs
       - flags_volume:/back/flags
-    ports:
-      - "8001:8000"
     networks:
       - app-network
     depends_on:
@@ -48,8 +46,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     env_file:
       - .env
-    ports:
-      - "5433:5432"
     networks:
       - app-network
     restart: unless-stopped
@@ -66,8 +62,6 @@ services:
       - redis_data:/data
     networks:
       - app-network
-    ports:
-      - 6380:6379
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     healthcheck:
@@ -139,8 +133,6 @@ services:
       - OSM_POLAND_URL
     networks:
       - app-network
-    ports:
-      - "9002:9000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:9000/health || exit 1"]
@@ -148,6 +140,20 @@ services:
       timeout: 10s
       retries: 3
       start_period: 3m
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      orr:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - app-network
+
 
 
 volumes:
