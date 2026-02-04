@@ -71,7 +71,7 @@
 2. Pobierz repozytoria będące submodułami
    ```bash
    git submodule init
-   git submodule upgrade
+   git submodule update
    ```
 3. Uruchom projekt za pomocą Docker Compose
    ```bash
