@@ -9,7 +9,7 @@ export const Search = () => {
     const [inputValue, setInputValue] = useState('');
     const [value, setValue] = useState<Stop | null>(null);
     
-    const { history, addToHistory } = useSearchHistory('stop-search');
+    const { history, addToHistory } = useSearchHistory();
 
     const handleOnChange = async (id: string) => {
         try {

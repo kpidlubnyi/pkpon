@@ -25,8 +25,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
 
   const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
 
-  const fromHistory = useSearchHistory('from');
-  const toHistory = useSearchHistory('to');
+  const { history, addToHistory } = useSearchHistory();
 
   const handleSearch = () => {
     if (fromValue && toValue) {
@@ -82,18 +81,18 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
           typeof option === 'string' ? option : option.stop_name
         }
         filterOptions={() => 
-          getFilteredOptions(fromInputValue, fromHistory.history, stops)
+          getFilteredOptions(fromInputValue, history, stops)
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
           setFromValue(newValue);
           if (newValue) {
-            fromHistory.addToHistory(newValue);
+            addToHistory(newValue);
           }
         }}
         groupBy={(option) => {
-          if (fromInputValue.length === 0 && fromHistory.history.length > 0) {
-            const isInHistory = fromHistory.history.some(
+          if (fromInputValue.length === 0 && history.length > 0) {
+            const isInHistory = history.some(
               h => h.stop_id === option.stop_id
             );
             return isInHistory ? 'Ostatnio wyszukiwane' : '';
@@ -217,18 +216,18 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
           typeof option === 'string' ? option : option.stop_name
         }
         filterOptions={() => 
-          getFilteredOptions(toInputValue, toHistory.history, stops)
+          getFilteredOptions(toInputValue, history, stops)
         }
         isOptionEqualToValue={(option, value) => option.stop_id === value.stop_id}
         onChange={(_, newValue) => {
           setToValue(newValue);
           if (newValue) {
-            toHistory.addToHistory(newValue);
+            addToHistory(newValue);
           }
         }}
         groupBy={(option) => {
-          if (toInputValue.length === 0 && toHistory.history.length > 0) {
-            const isInHistory = toHistory.history.some(
+          if (toInputValue.length === 0 && history.length > 0) {
+            const isInHistory = history.some(
               h => h.stop_id === option.stop_id
             );
             return isInHistory ? 'Ostatnio wyszukiwane' : '';
