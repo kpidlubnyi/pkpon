@@ -6,11 +6,6 @@ wheels/
 *.egg-info
 
 .venv
-.env
-.env.local
-
-todo.md
-analisys.ipynb
 
 backend/core/logs/*.log
 

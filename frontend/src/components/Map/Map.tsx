@@ -28,7 +28,7 @@ export const Map = () => {
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a> &amp; <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a>'
-          url="https://api.maptiler.com/maps/dataviz-light/256/{z}/{x}/{y}.png?key=DyARaDXHWKrnJxTiqqnW"
+          url="https://api.maptiler.com/maps/dataviz-light/256/{z}/{x}/{y}.png?key=t2HclWyBNmTvREZD4M45"
         />
 
         <LocateButton setPosition={setPosition} />
