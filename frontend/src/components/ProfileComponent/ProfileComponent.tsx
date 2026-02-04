@@ -13,7 +13,7 @@ export const ProfileComponent = ({ user, onLogout }: ProfileComponentProps) => {
         <div className={css['profile-container']}>
             <div className={css['profile-content']}>
                 <div>
-                    <h2 className={css['profile-title']}>Username</h2>
+                    <h2 className={css['profile-title']}>Nazwa użytkownika</h2>
                     <p className={css['username-content']}>{user.username}</p>
                 </div>
                 <div>

@@ -63,7 +63,7 @@ export const Search = () => {
                     const isInHistory = history.some(
                         h => h.stop_id === option.stop_id
                     );
-                    return isInHistory ? 'Ostatnie' : '';
+                    return isInHistory ? 'Ostatnio wyszukiwane' : '';
                 }
                 return '';
             }}

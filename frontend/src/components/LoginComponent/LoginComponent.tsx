@@ -45,7 +45,7 @@ export const LoginComponent = () => {
                                 name="email"
                                 className={`${css['input']} ${errors.email && touched.email ? css['input-error'] : ''
                                     }`}
-                                placeholder="Enter your email"
+                                placeholder="you@example.com"
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 value={values.email}
@@ -55,7 +55,7 @@ export const LoginComponent = () => {
                         <label
                             className={`${css['input-wrapper']}`}
                         >
-                            <span className={css['input-label']}>Password</span>
+                            <span className={css['input-label']}>Hasło</span>
                             <Field
                                 type="password"
                                 name="password"
@@ -64,7 +64,7 @@ export const LoginComponent = () => {
                                 value={values.password}
                                 className={`${css['input']} ${errors.password && touched.password ? css['input-error'] : ''
                                     }`}
-                                placeholder="Enter your password"
+                                placeholder="Example123!"
                             />
                             <ErrorMessage name="password" component="div" className={css['error-message']} />
                         </label>
@@ -72,7 +72,7 @@ export const LoginComponent = () => {
                             {isSubmitting ? (
                                 <Loading source='user' />
                             ) : (
-                                'SIGN IN'
+                                'ZALOGUJ SIĘ'
                             )}
                         </button>
                     </form>

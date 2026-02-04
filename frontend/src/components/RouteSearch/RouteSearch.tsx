@@ -96,7 +96,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
             const isInHistory = fromHistory.history.some(
               h => h.stop_id === option.stop_id
             );
-            return isInHistory ? 'Ostatnie' : '';
+            return isInHistory ? 'Ostatnio wyszukiwane' : '';
           }
           return '';
         }}
@@ -231,7 +231,7 @@ export const RouteSearch = ({ onRouteSearch }: RouteSearchProps) => {
             const isInHistory = toHistory.history.some(
               h => h.stop_id === option.stop_id
             );
-            return isInHistory ? 'Ostatnie' : '';
+            return isInHistory ? 'Ostatnio wyszukiwane' : '';
           }
           return '';
         }}

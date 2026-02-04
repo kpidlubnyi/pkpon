@@ -51,7 +51,7 @@ export const StopInfo = () => {
           <CloseIcon className={css['close']} onClick={clearSelectedSchedule} width={30} height={30}/>
             <div className={css['stop-name-cont']}>
                 <h2 className={css['stop-name']}>{selectedStop?.stop_name}</h2>
-                <div className={css["isochrone-icon"]} data-tooltip="Mapa izochroniczna nie jest jeszcze dostępna, prosimy o cierpliwość :)">
+                <div className={css["isochrone-icon"]} data-tooltip="Mapa izochroniczna będzie dostępna w najbliższej aktualizacji. Dziękujemy za cierpliwość :)">
     <IsoChrone width={30} height={30} />
 </div>
             </div>
@@ -96,7 +96,8 @@ export const StopInfo = () => {
                     <Loading source="stops"/>
                     {selectedStopSchedule && selectedStopSchedule?.schedule.length < 1 ? (
                         <h2 className={css['no-train']}>
-                            W tym momencie nie ma żadnych pociągów, spróbuj zmienić datę albo czas
+                            Nie znaleziono połączeń dla wybranej daty i godziny.
+                            Spróbuj zmienić datę lub czas.
                         </h2>
                     ) : (
                         <ul className={css['schedule-list']}>

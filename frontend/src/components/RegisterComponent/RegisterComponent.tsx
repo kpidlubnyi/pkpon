@@ -31,11 +31,11 @@ export const RegisterComponent = () => {
           <form onSubmit={handleSubmit} className={css['form-register']}>
             
             <label className={css['input-wrapper']}>
-              <span className={css['input-label']}>Username</span>
+              <span className={css['input-label']}>Nazwa użytkownika</span>
               <Field
                 type="text"
                 name="username"
-                placeholder="Enter your username"
+                placeholder="your_nickname"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.username}
@@ -51,7 +51,7 @@ export const RegisterComponent = () => {
               <Field
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.email}
@@ -63,11 +63,11 @@ export const RegisterComponent = () => {
             </label>
 
             <label className={css['input-wrapper']}>
-              <span className={css['input-label']}>Password</span>
+              <span className={css['input-label']}>Hasło</span>
               <Field
                 type="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder="Example123!"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.password}
@@ -79,11 +79,11 @@ export const RegisterComponent = () => {
             </label>
 
             <label className={css['input-wrapper']}>
-              <span className={css['input-label']}>Confirm Password</span>
+              <span className={css['input-label']}>Potwierdź hasło</span>
               <Field
                 type="password"
                 name="confirmPassword"
-                placeholder="Confirm your password"
+                placeholder="Example123!"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 value={values.confirmPassword}
@@ -99,7 +99,7 @@ export const RegisterComponent = () => {
               type="submit"
               disabled={isSubmitting}
             >
-              SIGN UP
+              UTWÓRZ KONTO
             </button>
           </form>
         )}

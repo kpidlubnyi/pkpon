@@ -20,13 +20,13 @@ export const ToggleComponent = ({active, setActive}:ToggleComponentProps) => {
           className={`${css['toggle-btn']} ${active === 'login' ? css['active'] : ''}`}
           onClick={() => setActive('login')}
         >
-          Login
+          Logowanie
         </button>
         <button
           className={`${css['toggle-btn']} ${active === 'register' ? css['active'] : ''}`}
           onClick={() => setActive('register')}
         >
-          Register
+          Rejestracja
         </button>
       </div>
     </div>
